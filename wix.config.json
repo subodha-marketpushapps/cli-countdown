@@ -1,0 +1,5 @@
+{
+  "$schema": "https://dev.wix.com/wix-cli/schemas/wix-config.json",
+  "appId": "6ba0bc96-44dc-425d-b6a0-326678c5203e",
+  "projectId": "cli-countdown"
+}

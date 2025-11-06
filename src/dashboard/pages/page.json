@@ -1,0 +1,5 @@
+{
+  "$schema": "https://dev.wix.com/wix-cli/schemas/dashboard-page.json",
+  "id": "68bc38c4-765c-4f7b-af50-1bb197df5a17",
+  "title": "cli countdown"
+}
