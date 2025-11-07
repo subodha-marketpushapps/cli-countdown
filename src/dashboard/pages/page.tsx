@@ -21,6 +21,8 @@ import PreviewArea from './PreviewArea';
 // Component ID from embedded.json
 const EMBEDDED_SCRIPT_COMPONENT_ID = '3a1cc044-7e31-4f0c-aefb-1113d572f101';
 
+import { TimerConfig } from './types';
+
 interface TimeRemaining {
   days: number;
   hours: number;
@@ -29,11 +31,12 @@ interface TimeRemaining {
 }
 
 const CountDownTimer: FC<{
-  targetDate: Date | undefined;
+  endDate: Date | undefined;
+  endTime: Date | undefined;
   format: 'full' | 'compact' | 'minimal';
   showLabels: boolean;
   size: 'small' | 'medium' | 'large';
-}> = ({ targetDate, format, showLabels, size }) => {
+}> = ({ endDate, endTime, format, showLabels, size }) => {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     days: 0,
     hours: 0,
@@ -43,11 +46,23 @@ const CountDownTimer: FC<{
   const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
-    if (!targetDate) {
+    if (!endDate) {
       return;
     }
 
     const calculateTimeRemaining = () => {
+      // Combine endDate and endTime to get the target datetime
+      const targetDate = new Date(endDate);
+      if (endTime) {
+        targetDate.setHours(endTime.getHours());
+        targetDate.setMinutes(endTime.getMinutes());
+        targetDate.setSeconds(endTime.getSeconds());
+        targetDate.setMilliseconds(endTime.getMilliseconds());
+      } else {
+        // Default to end of day if no endTime specified
+        targetDate.setHours(23, 59, 59, 0);
+      }
+
       const now = new Date().getTime();
       const target = targetDate.getTime();
       const difference = target - now;
@@ -71,12 +86,12 @@ const CountDownTimer: FC<{
     const interval = setInterval(calculateTimeRemaining, 1000);
 
     return () => clearInterval(interval);
-  }, [targetDate]);
+  }, [endDate, endTime]);
 
-  if (!targetDate) {
+  if (!endDate) {
     return (
       <Box align="center" verticalAlign="middle" padding="SP6">
-        <Text secondary>Please select a target date to start the countdown</Text>
+        <Text secondary>Please select an end date to start the countdown</Text>
       </Box>
     );
   }
@@ -197,28 +212,39 @@ const CountDownTimer: FC<{
   );
 };
 
-interface TimerConfig {
-  targetDate: Date | undefined;
-  format: 'full' | 'compact' | 'minimal';
-  showLabels: boolean;
-  size: 'small' | 'medium' | 'large';
-  placement: 'top' | 'center' | 'bottom';
-  title: string;
-  message: string;
-}
-
 const Index: FC = () => {
   const [selectedSidebar, setSelectedSidebar] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-  
+
   const [config, setConfig] = useState<TimerConfig>({
-    targetDate: (() => {
-    const date = new Date();
-    date.setDate(date.getDate() + 7); // Default to 7 days from now
-    return date;
-    })(),
+    timerMode: 'start-to-finish-timer',
+    timerConfig: {
+      startDate: new Date(),
+      startTime: (() => {
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        return date;
+      })(),
+      endDate: (() => {
+        const date = new Date();
+        date.setDate(date.getDate() + 7);
+        return date;
+      })(),
+      endTime: (() => {
+        const date = new Date();
+        date.setHours(23, 59, 59, 0);
+        return date;
+      })(),
+      timeZone: 'UTC',
+      displayOptions: {
+        showDays: true,
+        showHours: true,
+        showMinutes: true,
+        showSeconds: true,
+      },
+    },
     format: 'full',
     showLabels: true,
     size: 'medium',
@@ -252,11 +278,50 @@ const Index: FC = () => {
           // Load all settings into config
           const loadedConfig: TimerConfig = { ...config };
 
-          // Load target date
-          if (params.targetDate) {
-            const date = new Date(params.targetDate as string);
-            if (!isNaN(date.getTime())) {
-              loadedConfig.targetDate = date;
+          // Load timer mode
+          if (params.timerMode && ['start-to-finish-timer', 'personal-countdown', 'number-counter'].includes(params.timerMode as string)) {
+            loadedConfig.timerMode = params.timerMode as 'start-to-finish-timer' | 'personal-countdown' | 'number-counter';
+          }
+
+          // Load timer config if available
+          if (params.timerConfig && typeof params.timerConfig === 'object') {
+            const timerConfig = params.timerConfig as any;
+            loadedConfig.timerConfig = {
+              startDate: timerConfig.startDate ? new Date(timerConfig.startDate) : undefined,
+              endDate: timerConfig.endDate ? new Date(timerConfig.endDate) : undefined,
+              startTime: timerConfig.startTime ? new Date(timerConfig.startTime) : (() => {
+                const date = new Date();
+                date.setHours(0, 0, 0, 0);
+                return date;
+              })(),
+              endTime: timerConfig.endTime ? new Date(timerConfig.endTime) : (() => {
+                const date = new Date();
+                date.setHours(23, 59, 59, 0);
+                return date;
+              })(),
+              timeZone: timerConfig.timeZone || 'UTC',
+              displayOptions: timerConfig.displayOptions || {
+                showDays: true,
+                showHours: true,
+                showMinutes: true,
+                showSeconds: true,
+              },
+            };
+          }
+
+          // Legacy support: if targetDate exists but no timerConfig.endDate, use targetDate as endDate
+          if (params.targetDate && !loadedConfig.timerConfig?.endDate) {
+            const targetDate = new Date(params.targetDate as string);
+            if (!isNaN(targetDate.getTime())) {
+              if (!loadedConfig.timerConfig) {
+                loadedConfig.timerConfig = {};
+              }
+              loadedConfig.timerConfig.endDate = targetDate;
+              if (!loadedConfig.timerConfig.endTime) {
+                const endTime = new Date();
+                endTime.setHours(23, 59, 59, 0);
+                loadedConfig.timerConfig.endTime = endTime;
+              }
             }
           }
 
@@ -309,17 +374,17 @@ const Index: FC = () => {
 
   const handleSave = useCallback(async () => {
     try {
-      if (!config.targetDate) {
-                              dashboard.showToast({
-                                message: 'Please select a target date',
-                                type: 'error',
-                              });
-                              return;
-                            }
+      if (!config.timerConfig?.endDate) {
+        dashboard.showToast({
+          message: 'Please select an end date',
+          type: 'error',
+        });
+        return;
+      }
 
       setIsSaving(true);
-      const scriptParameters = {
-        targetDate: config.targetDate.toISOString(),
+      const scriptParameters: any = {
+        timerMode: config.timerMode,
         format: config.format,
         showLabels: config.showLabels.toString(),
         size: config.size,
@@ -327,6 +392,18 @@ const Index: FC = () => {
         title: config.title || 'Countdown Timer',
         message: config.message || '',
       };
+
+      // Include timerConfig if it exists
+      if (config.timerConfig) {
+        scriptParameters.timerConfig = {
+          startDate: config.timerConfig.startDate ? config.timerConfig.startDate.toISOString() : undefined,
+          endDate: config.timerConfig.endDate ? config.timerConfig.endDate.toISOString() : undefined,
+          startTime: config.timerConfig.startTime ? config.timerConfig.startTime.toISOString() : undefined,
+          endTime: config.timerConfig.endTime ? config.timerConfig.endTime.toISOString() : undefined,
+          timeZone: config.timerConfig.timeZone,
+          displayOptions: config.timerConfig.displayOptions,
+        };
+      }
 
       // Check if script is already embedded
       let isAlreadyEmbedded = false;
@@ -341,37 +418,37 @@ const Index: FC = () => {
       }
 
       // Embed or update the script
-                            await embeddedScripts.embedScript(
-                              {
+      await embeddedScripts.embedScript(
+        {
           parameters: scriptParameters,
-                                disabled: false,
-                              },
-                              {
-                                componentId: EMBEDDED_SCRIPT_COMPONENT_ID,
-                              }
-                            );
+          disabled: false,
+        },
+        {
+          componentId: EMBEDDED_SCRIPT_COMPONENT_ID,
+        }
+      );
 
-                            dashboard.showToast({
-        message: isAlreadyEmbedded 
+      dashboard.showToast({
+        message: isAlreadyEmbedded
           ? 'Countdown timer widget settings have been updated on your site!'
           : 'Countdown timer widget has been embedded on your site!',
-                              type: 'success',
-                            });
-                          } catch (error: any) {
-                            console.error('Error embedding script:', error);
-                            
-                            let errorMessage = 'Failed to embed countdown timer.';
-                            
-                            if (error?.status === 403 || error?.statusCode === 403 || error?.response?.status === 403) {
+        type: 'success',
+      });
+    } catch (error: any) {
+      console.error('Error embedding script:', error);
+
+      let errorMessage = 'Failed to embed countdown timer.';
+
+      if (error?.status === 403 || error?.statusCode === 403 || error?.response?.status === 403) {
         errorMessage = 'Permission denied (403). The app needs APPS.MANAGE_EMBEDDED_SCRIPT permission.';
-                            } else if (error?.message) {
-                              errorMessage = `Error: ${error.message}`;
-                            }
-                            
-                            dashboard.showToast({
-                              message: errorMessage,
-                              type: 'error',
-                            });
+      } else if (error?.message) {
+        errorMessage = `Error: ${error.message}`;
+      }
+
+      dashboard.showToast({
+        message: errorMessage,
+        type: 'error',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -412,52 +489,57 @@ const Index: FC = () => {
               width="100vw"
             >
               <Loader text="Loading settings..." size="large" />
-                    </Box>
+            </Box>
           ) : (
-                <Box gap="0" height="calc(100dvh - 66px)" direction="horizontal">
-                  <ComposerSidebar
-                    labelPlacement="bottom"
-                    items={sidebarItems}
-                    selectedId={selectedSidebar}
-                    // @ts-ignore
-                    onClick={(_, data) => setSelectedSidebar(Number(data.id))}
-                    zIndex={100000000}
-                  />
-                  <SidePanelContainer isShowing={selectedSidebar !== -1}>
-                    <div style={{ backgroundColor: "#FFFFFF", border: "2px solid #fff" }}>
-                      {selectedSidebar === 0 && (
-                        <PanelTimer
-                          config={config}
-                          onChange={handleConfigChange}
-                          onCloseButtonClick={() => setSelectedSidebar(-1)}
-                        />
-                      )}
-                      {selectedSidebar === 1 && (
-                        <PanelContent
-                          config={config}
-                          onChange={handleConfigChange}
-                          onCloseButtonClick={() => setSelectedSidebar(-1)}
-                        />
-                      )}
-                      {selectedSidebar === 2 && (
-                        <PanelPosition
-                          config={config}
-                          onChange={handleConfigChange}
-                          onCloseButtonClick={() => setSelectedSidebar(-1)}
-                        />
-                      )}
-                    </div>
-                  </SidePanelContainer>
+            <Box gap="0" height="calc(100dvh - 66px)" direction="horizontal">
+              <ComposerSidebar
+                labelPlacement="bottom"
+                items={sidebarItems}
+                selectedId={selectedSidebar}
+                // @ts-ignore
+                onClick={(_, data) => setSelectedSidebar(Number(data.id))}
+                zIndex={100000000}
+              />
+              <SidePanelContainer isShowing={selectedSidebar !== -1}>
+                <div style={{ backgroundColor: "#FFFFFF", border: "2px solid #fff" }}>
+                  {selectedSidebar === 0 && (
+                    <PanelTimer
+                      config={config}
+                      onChange={handleConfigChange}
+                      onCloseButtonClick={() => setSelectedSidebar(-1)}
+                    />
+                  )}
+                  {selectedSidebar === 1 && (
+                    <PanelContent
+                      config={config}
+                      onChange={handleConfigChange}
+                      onCloseButtonClick={() => setSelectedSidebar(-1)}
+                    />
+                  )}
+                  {selectedSidebar === 2 && (
+                    <PanelPosition
+                      config={config}
+                      onChange={handleConfigChange}
+                      onCloseButtonClick={() => setSelectedSidebar(-1)}
+                    />
+                  )}
+                </div>
+              </SidePanelContainer>
 
-                  {/* Preview Area */}
+              {/* Preview Area */}
+              <div style={{ width: '100%', height: '100%', margin: '16px' }}>
+                <PreviewArea
+                  config={config}
+                  CountDownTimer={CountDownTimer}
+                  endDate={config.timerConfig?.endDate}
+                  endTime={config.timerConfig?.endTime}
+                />
+              </div>
 
-                  <div style={{ width: '100%', height: '100%', margin:'16px' }}>
-                    <PreviewArea config={config} CountDownTimer={CountDownTimer} />
-                  </div>
-                </Box>
-              )}
-            </Cell>
-          </Layout>
+            </Box>
+          )}
+        </Cell>
+      </Layout>
     </WixDesignSystemProvider>
   );
 };

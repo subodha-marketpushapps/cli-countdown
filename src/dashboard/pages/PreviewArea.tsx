@@ -1,27 +1,21 @@
 import React from 'react';
 import { Box, Card, Text, InfoIcon, Button } from '@wix/design-system';
-
-interface TimerConfig {
-  targetDate: Date | undefined;
-  format: 'full' | 'compact' | 'minimal';
-  showLabels: boolean;
-  size: 'small' | 'medium' | 'large';
-  placement: 'top' | 'center' | 'bottom';
-  title: string;
-  message: string;
-}
+import { TimerConfig } from './types';
 
 interface PreviewAreaProps {
   config: TimerConfig;
+  endDate: Date | undefined;
+  endTime: Date | undefined;
   CountDownTimer: React.FC<{
-    targetDate: Date | undefined;
+    endDate: Date | undefined;
+    endTime: Date | undefined;
     format: 'full' | 'compact' | 'minimal';
     showLabels: boolean;
     size: 'small' | 'medium' | 'large';
   }>;
 }
 
-const PreviewArea: React.FC<PreviewAreaProps> = ({ config, CountDownTimer }) => {
+const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime, CountDownTimer }) => {
   return (
     <Box
       flex="1"
@@ -30,7 +24,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, CountDownTimer }) => 
       backgroundColor="#FFFFFF96"
       position="relative"
       style={{
-        overflow: "auto",
+        overflow: "auto"
       }}
       borderRadius="0px"    
     >
@@ -42,6 +36,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, CountDownTimer }) => 
           padding: "20px",
           minHeight: "100%",
         }}
+
       >
         {/* Countdown Timer Preview */}
         <div style={{ width: '100%', backgroundColor: '#FFFFFF', display: 'flex', flexDirection: 'row', gap: '16px', height: '180px', alignItems: 'center', justifyContent: 'space-between', padding: '24px'}}>
@@ -56,7 +51,8 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, CountDownTimer }) => 
               </Box>
             )}
             <CountDownTimer
-              targetDate={config.targetDate}
+              endDate={endDate}
+              endTime={endTime}
               format={config.format}
               showLabels={config.showLabels}
               size={config.size}

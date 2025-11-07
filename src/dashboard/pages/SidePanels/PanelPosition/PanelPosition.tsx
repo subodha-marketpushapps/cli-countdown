@@ -7,16 +7,7 @@ import {
 } from "@wix/design-system";
 import { DEFAULT_PANEL_WIDTH } from "../SidePanelContainer";
 import { renderSectionTitle } from "../utils/renderSectionTitle";
-
-interface TimerConfig {
-  targetDate: Date | undefined;
-  format: 'full' | 'compact' | 'minimal';
-  showLabels: boolean;
-  size: 'small' | 'medium' | 'large';
-  placement: 'top' | 'center' | 'bottom';
-  title: string;
-  message: string;
-}
+import { TimerConfig } from "../../types";
 
 interface Props {
   config: TimerConfig;
