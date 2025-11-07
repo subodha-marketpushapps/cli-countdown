@@ -1,0 +1,7 @@
+{
+  "$schema": "https://dev.wix.com/wix-cli/schemas/embedded-script.json",
+  "id": "3a1cc044-7e31-4f0c-aefb-1113d572f101",
+  "name": "Countdown Timer",
+  "scriptType": "FUNCTIONAL",
+  "placement": "BODY_START"
+}

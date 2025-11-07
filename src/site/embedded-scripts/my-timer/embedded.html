@@ -1,0 +1,23 @@
+<!-- Countdown Timer Widget -->
+<link rel="stylesheet" href="./countdown-styles.css" />
+
+<div id="wix-countdown-timer"
+     data-target-date="{{targetDate}}"
+     data-format="{{format}}"
+     data-show-labels="{{showLabels}}"
+     data-size="{{size}}"
+     data-placement="{{placement}}"
+     data-title="{{title}}"
+     data-message="{{message}}">
+  <!-- Timer will be rendered here by React -->
+</div>
+
+<!-- 
+  Note: To use the React version, uncomment the line below and comment out the vanilla TS version.
+  Make sure React is bundled by Wix CLI or loaded via CDN.
+  The Wix CLI build process should handle bundling React if it's in your dependencies.
+-->
+<script type="module" src="./countdown-timer-react.tsx"></script>
+
+<!-- Original vanilla TypeScript version (currently commented out) -->
+<!-- <script type="module" src="./countdown-timer.ts"></script> -->

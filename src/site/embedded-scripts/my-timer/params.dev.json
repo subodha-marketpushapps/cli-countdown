@@ -1,0 +1,9 @@
+{
+  "targetDate": "2025-12-31T23:59:59",
+  "format": "full",
+  "showLabels": "true",
+  "size": "medium",
+  "placement": "top",
+  "title": "New Year Countdown",
+  "message": "Time remaining until New Year 2026"
+}
