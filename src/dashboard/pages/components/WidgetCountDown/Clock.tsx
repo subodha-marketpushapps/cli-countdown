@@ -157,24 +157,15 @@ const Clock: React.FC<ClockProps> = ({
     <Box
       direction="horizontal"
       align="center"
-      gap="SP2"
+      gap="SP1"
       style={{
-        padding: '16px',
+        padding: '8px',
         justifyContent: 'center',
       }}
     >
       {renderDigit(formatNumber(timeRemaining.days), 'Days')}
-      <Text size="medium" weight="bold" style={{ color: textColor, margin: '0 4px' }}>
-        :
-      </Text>
       {renderDigit(formatNumber(timeRemaining.hours), 'Hours')}
-      <Text size="medium" weight="bold" style={{ color: textColor, margin: '0 4px' }}>
-        :
-      </Text>
       {renderDigit(formatNumber(timeRemaining.minutes), 'Minutes')}
-      <Text size="medium" weight="bold" style={{ color: textColor, margin: '0 4px' }}>
-        :
-      </Text>
       {renderDigit(formatNumber(timeRemaining.seconds), 'Seconds')}
     </Box>
   );

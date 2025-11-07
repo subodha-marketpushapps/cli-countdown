@@ -36,69 +36,184 @@ const PanelAppearance: React.FC<Props> = ({
         'template-3': 'bottom',
     };
 
+    const timeNumberBackgroundColor = "#2563eb";
+
     // Template configurations for the carousel
     const templateItems: CarouselItem[] = [
         {
             id: "template-1",
-            label: "Template 1",
             content: (
-                <CountDownTemplate
-                    clockConfig={{
-                        labelPosition: "bottom",
-                        numberStyle: "fillEachDigit",
-                        endDate: new Date("2025-12-31"),
-                        endTime: "23:59:59",
-                        backgroundColor: "#2563eb",
-                        textColor: "#ffffff",
-                    }}
-                    title="Limited Time Offer"
-                    subTitle="Up to 20% Discount"
-                    buttonText="Shop Now"
-                    buttonLink="https://example.com/shop"
-                    scale={0.5}
-                />
+                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                    <CountDownTemplate
+                        clockConfig={{
+                            labelPosition: "top",
+                            numberStyle: "filled",
+                            endDate: new Date("2025-12-31"),
+                            endTime: "23:59:59",
+                            backgroundColor: timeNumberBackgroundColor,
+                            textColor: "#ffffff",
+                        }}
+                        title="Flash Sale"
+                        subTitle="Limited Stock"
+                        buttonText="Shop Now"
+                        buttonLink="https://example.com/shop"
+                        scale={0.65}
+                    />
+                </div>
             ),
         },
         {
             id: "template-2",
-            label: "Template 2",
             content: (
-                <CountDownTemplate
-                    clockConfig={{
-                        labelPosition: "top",
-                        numberStyle: "outlineEachDigit",
-                        endDate: new Date("2025-12-31"),
-                        endTime: "23:59:59",
-                        backgroundColor: "#10b981",
-                        textColor: "#10b981",
-                    }}
-                    title="Sale Ends Soon"
-                    subTitle="Up to 50% Off"
-                    buttonText="View Deals"
-                    buttonLink="https://example.com/deals"
-                    scale={0.5}
-                />
+                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                    <CountDownTemplate
+                        clockConfig={{
+                            labelPosition: "top",
+                            numberStyle: "outline",
+                            endDate: new Date("2025-12-31"),
+                            endTime: "23:59:59",
+                            backgroundColor: timeNumberBackgroundColor,
+                            textColor: "#10b981",
+                        }}
+                        title="Flash Sale"
+                        subTitle="Limited Stock"
+                        buttonText="View Deals"
+                        buttonLink="https://example.com/deals"
+                        scale={0.65}
+                    />
+                </div>
             ),
         },
         {
             id: "template-3",
-            label: "Template 3",
             content: (
-                <CountDownTemplate
-                    clockConfig={{
-                        labelPosition: "bottom",
-                        numberStyle: "filled",
-                        endDate: new Date("2025-12-31"),
-                        endTime: "23:59:59",
-                        backgroundColor: "#f59e0b",
-                        textColor: "#ffffff",
-                    }}
-                    title="Flash Sale"
-                    subTitle="Limited Stock"
-                    buttonText="Buy Now"
-                    buttonLink="https://example.com/buy"
-                    scale={0.5}
-                />
+                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                    <CountDownTemplate
+                        clockConfig={{
+                            labelPosition: "top",
+                            numberStyle: "fillEachDigit",
+                            endDate: new Date("2025-12-31"),
+                            endTime: "23:59:59",
+                            backgroundColor: timeNumberBackgroundColor,
+                            textColor: "#ffffff",
+                        }}
+                        title="Flash Sale"
+                        subTitle="Limited Stock"
+                        buttonText="Buy Now"
+                        buttonLink="https://example.com/buy"
+                        scale={0.5}
+                    />
+                </div>
+            ),
+        },
+        {
+            id: "template-4",
+            content: (
+                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                    <CountDownTemplate
+                        clockConfig={{
+                            labelPosition: "top",
+                            numberStyle: "outlineEachDigit",
+                            endDate: new Date("2025-12-31"),
+                            endTime: "23:59:59",
+                            backgroundColor: timeNumberBackgroundColor,
+                            textColor: "#ffffff",
+                        }}
+                        title="Flash Sale"
+                        subTitle="Limited Stock"
+                        buttonText="Buy Now"
+                        buttonLink="https://example.com/buy"
+                        scale={0.5}
+                    />
+                </div>
+            ),
+        },
+        {
+            id: "template-5",
+            content: (
+                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                    <CountDownTemplate
+                        clockConfig={{
+                            labelPosition: "bottom",
+                            numberStyle: "filled",
+                            endDate: new Date("2025-12-31"),
+                            endTime: "23:59:59",
+                            backgroundColor: timeNumberBackgroundColor,
+                            textColor: "#ffffff",
+                        }}
+                        title="Flash Sale"
+                        subTitle="Limited Stock"
+                        buttonText="Shop Now"
+                        buttonLink="https://example.com/shop"
+                        scale={0.65}
+                    />
+                </div>
+            ),
+        },
+        {
+            id: "template-6",
+            content: (
+                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                    <CountDownTemplate
+                        clockConfig={{
+                            labelPosition: "bottom",
+                            numberStyle: "outline",
+                            endDate: new Date("2025-12-31"),
+                            endTime: "23:59:59",
+                            backgroundColor: timeNumberBackgroundColor,
+                            textColor: "#10b981",
+                        }}
+                        title="Flash Sale"
+                        subTitle="Limited Stock"
+                        buttonText="View Deals"
+                        buttonLink="https://example.com/deals"
+                        scale={0.65}
+                    />
+                </div>
+            ),
+        },
+        {
+            id: "template-7",
+            content: (
+                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                    <CountDownTemplate
+                        clockConfig={{
+                            labelPosition: "bottom",
+                            numberStyle: "fillEachDigit",
+                            endDate: new Date("2025-12-31"),
+                            endTime: "23:59:59",
+                            backgroundColor: timeNumberBackgroundColor,
+                            textColor: "#ffffff",
+                        }}
+                        title="Flash Sale"
+                        subTitle="Limited Stock"
+                        buttonText="Buy Now"
+                        buttonLink="https://example.com/buy"
+                        scale={0.5}
+                    />
+                </div>
+            ),
+        },
+        {
+            id: "template-8",
+            content: (
+                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                    <CountDownTemplate
+                        clockConfig={{
+                            labelPosition: "bottom",
+                            numberStyle: "outlineEachDigit",
+                            endDate: new Date("2025-12-31"),
+                            endTime: "23:59:59",
+                            backgroundColor: timeNumberBackgroundColor,
+                            textColor: "#ffffff",
+                        }}
+                        title="Flash Sale"
+                        subTitle="Limited Stock"
+                        buttonText="Buy Now"
+                        buttonLink="https://example.com/buy"
+                        scale={0.5}
+                    />
+                </div>
             ),
         },
     ];
@@ -332,7 +447,7 @@ const PanelAppearance: React.FC<Props> = ({
                 <SidePanel.Section title={renderSectionTitle("Template", "Chose a layout style for your countdown bar. each template changes how the text, timer and button are arranged.")}>
                     <SidePanel.Field divider={false}>
                         <FormField>
-                            <div style={{margin: "20px"}}>
+                            <div style={{margin: "8px"}}>
                                 <Carousel
                                     items={templateItems}
                                     autoSlide={false}
