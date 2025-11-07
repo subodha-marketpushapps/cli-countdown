@@ -170,16 +170,19 @@ const CountDownTimer: FC<CountDownTimerProps> = ({
     return (
       <Box 
         align="center" 
-        style={restStyle}
+        direction="vertical"
+        gap="SP1"
       >
         {labelPosition === 'top' && showLabels && (
           <Text size={textSize} weight="normal" style={{ color: color, opacity: 0.8 }}>
             {label}
           </Text>
         )}
+        <div style={restStyle}>
         <Text weight="bold" size={numberSize} style={{ color: color }}>
           {value}
         </Text>
+        </div>
         {labelPosition === 'bottom' && showLabels && (
           <Text size={textSize} weight="normal" style={{ color: color, opacity: 0.8 }}>
             {label}
@@ -195,15 +198,15 @@ const CountDownTimer: FC<CountDownTimerProps> = ({
       align="center" 
       verticalAlign="middle" 
       padding="SP6" 
-      gap="SP2"
-      style={{ justifyContent: 'center' }}
+      gap="SP3"
+      style={{ justifyContent: 'center', flex:1 }}
     >
       {renderTimeUnit(String(timeRemaining.days).padStart(2, '0'), 'Days')}
-      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
+
       {renderTimeUnit(String(timeRemaining.hours).padStart(2, '0'), 'Hours')}
-      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
+
       {renderTimeUnit(String(timeRemaining.minutes).padStart(2, '0'), 'Minutes')}
-      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
+
       {renderTimeUnit(String(timeRemaining.seconds).padStart(2, '0'), 'Seconds')}
     </Box>
   );

@@ -163,10 +163,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
           minHeight: '100%',
         }}
       >
-        {/* Countdown Timer Preview */}
-        <div style={getPlacementStyles()}>
-          <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-            {config.placement === 'centered_overlay' && (
+        {config.placement === 'centered_overlay' && (
               <IconButton
                 skin="dark"
                 priority="tertiary"
@@ -187,6 +184,11 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
                 <Icons.X />
               </IconButton>
             )}
+        {/* Countdown Timer Preview */}
+        <div style={getPlacementStyles()}>
+          
+          <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+            
             {config.message && (
               <Box direction="vertical" gap="SP2" style={{ flex: '1', minWidth: 0 }}>
                 <Text size="medium" weight="bold" secondary>
@@ -207,7 +209,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
               backgroundColor={config.backgroundColor}
               textColor={config.textColor}
             />
-            <Box style={{ flexShrink: 0 }}>
+            <Box style={{ flexShrink: 0, flex:1, justifyContent: 'flex-end' }}>
               <Button priority="primary">Shop Now</Button>
             </Box>
           </div>
