@@ -57,7 +57,6 @@ const Index: FC = () => {
         showSeconds: true,
       },
     },
-    showLabels: true,
     placement: 'static_top',
     title: 'Countdown Timer',
     message: 'Time remaining until the event',
@@ -166,16 +165,6 @@ const Index: FC = () => {
             loadedConfig.textColor = params.textColor as string;
           }
 
-          // Load show labels
-          if (params.showLabels !== undefined) {
-            const showLabelsValue = params.showLabels;
-            if (typeof showLabelsValue === 'boolean') {
-              loadedConfig.showLabels = showLabelsValue;
-            } else if (typeof showLabelsValue === 'string') {
-              loadedConfig.showLabels = showLabelsValue === 'true' || showLabelsValue.toLowerCase() === 'true';
-            }
-          }
-
           // Load placement
           if (params.placement && ['centered_overlay', 'static_top', 'floating_top', 'floating_bottom'].includes(params.placement as string)) {
             loadedConfig.placement = params.placement as 'centered_overlay' | 'static_top' | 'floating_top' | 'floating_bottom';
@@ -216,7 +205,6 @@ const Index: FC = () => {
       setIsSaving(true);
       const scriptParameters: any = {
         timerMode: config.timerMode,
-        showLabels: config.showLabels.toString(),
         placement: config.placement,
         title: config.title || 'Countdown Timer',
         message: config.message || '',

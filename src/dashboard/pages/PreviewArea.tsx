@@ -199,11 +199,10 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
                 </Text>
               </Box>
             )}
-            <CountDownTimer
-              endDate={endDate}
-              endTime={endTime}
-              showLabels={config.showLabels}
-              selectedClockStyle={config.selectedClockStyle}
+          <CountDownTimer
+            endDate={endDate}
+            endTime={endTime}
+            selectedClockStyle={config.selectedClockStyle}
               labelPosition={config.labelPosition}
               numberStyle={config.numberStyle}
               backgroundColor={config.backgroundColor}

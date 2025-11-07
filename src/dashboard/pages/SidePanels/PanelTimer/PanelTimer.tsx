@@ -5,11 +5,12 @@ import {
   FormField,
   SidePanel,
   Layout,
-  ToggleSwitch,
   Dropdown,
   DatePicker,
   TimeInput,
-  Checkbox
+  Checkbox,
+  Input,
+  ToggleSwitch
 } from "@wix/design-system";
 import { DEFAULT_PANEL_WIDTH } from "../SidePanelContainer";
 import { renderSectionTitle } from "../utils/renderSectionTitle";
@@ -247,18 +248,121 @@ const PanelTimer: React.FC<Props> = ({
               </Layout>
             </FormField>
           </SidePanel.Field>
+        </SidePanel.Section>
+
+        <SidePanel.Section title={renderSectionTitle("Action After Timer Finishes", "Decide what happens when the timer reaches 0: hide the timer, show a message or redirect")}>
           <SidePanel.Field divider={false}>
             <FormField>
-              <Box direction="horizontal" style={{ justifyContent: "space-between" }}>
-                <Text secondary size="small">Show Labels</Text>
-                <ToggleSwitch
-                  size="small"
-                  checked={config.showLabels}
-                  onChange={(e) => onChange({ ...config, showLabels: e.target.checked })}
-                />
+              <Box direction="vertical" gap="8px">
+                <Text secondary size="small">Select Action</Text>
+                <Layout cols={1} gap="12px">
+                  <Dropdown 
+                    size="small" 
+                    selectedId={config.actionConfig?.action || "hide"}
+                    onSelect={(option) => onChange({ 
+                      ...config, 
+                      actionConfig: { 
+                        ...config.actionConfig,
+                        action: (option?.id as 'hide' | 'show-message' | 'redirect') || "show-message"
+                      } 
+                    })}
+                    options={[
+                      { id: 'hide', value: 'Hide Timer' },
+                      { id: 'show-message', value: 'Show Message' },
+                      { id: 'redirect', value: 'Redirect to URL' },
+                    ]} 
+                  />
+                </Layout>
               </Box>
             </FormField>
           </SidePanel.Field>
+
+          {config.actionConfig?.action === "show-message" && (
+            <>
+              <SidePanel.Field divider={false}>
+                <FormField>
+                  <Box direction="vertical" gap="8px">
+                    <Text secondary size="small">Message</Text>
+                    <Layout cols={1} gap="12px">
+                      <Input 
+                        size="small" 
+                        placeholder="The sale has ended. Thank you for your interest!"
+                        value={config.actionConfig?.message || ""}
+                        onChange={(e) => onChange({ 
+                          ...config, 
+                          actionConfig: { 
+                            ...config.actionConfig,
+                            message: e.target.value
+                          } 
+                        })}
+                      />
+                    </Layout>
+                  </Box>
+                </FormField>
+              </SidePanel.Field>
+
+              <SidePanel.Field divider={false}>
+                <Box direction="vertical" gap="8px">
+                  <FormField>
+                    <Box direction="horizontal" style={{ justifyContent: "space-between" }}>
+                      <Text secondary size="small">Show Countries</Text>
+                      <ToggleSwitch 
+                        size="small" 
+                        checked={config.actionConfig?.showCountries ?? false}
+                        onChange={(e) => onChange({ 
+                          ...config, 
+                          actionConfig: { 
+                            ...config.actionConfig,
+                            showCountries: e.target.checked
+                          } 
+                        })}
+                      />
+                    </Box>
+                  </FormField>
+                  <FormField>
+                    <Box direction="horizontal" style={{ justifyContent: "space-between" }}>
+                      <Text secondary size="small">Show Button</Text>
+                      <ToggleSwitch 
+                        size="small" 
+                        checked={config.actionConfig?.showButton ?? false}
+                        onChange={(e) => onChange({ 
+                          ...config, 
+                          actionConfig: { 
+                            ...config.actionConfig,
+                            showButton: e.target.checked
+                          } 
+                        })}
+                      />
+                    </Box>
+                  </FormField>
+                </Box>
+              </SidePanel.Field>
+            </>
+          )}
+
+          {config.actionConfig?.action === "redirect" && (
+            <SidePanel.Field divider={false}>
+              <FormField>
+                <Box direction="vertical" gap="8px">
+                  <Text secondary size="small">URL to Redirect</Text>
+                  <Layout cols={1} gap="12px">
+                    <Input 
+                      size="small" 
+                      placeholder="https://example.com"
+                      value={config.actionConfig?.redirectUrl || ""}
+                      onChange={(e) => onChange({ 
+                        ...config, 
+                        actionConfig: { 
+                          ...config.actionConfig,
+                          redirectUrl: e.target.value
+                        } 
+                      })}
+                    />
+                  </Layout>
+                </Box>
+              </FormField>
+            </SidePanel.Field>
+          )}
         </SidePanel.Section>
       </SidePanel.Content>
     </SidePanel>

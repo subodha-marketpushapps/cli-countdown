@@ -11,7 +11,6 @@ interface TimeRemaining {
 export interface CountDownTimerProps {
   endDate: Date | undefined;
   endTime: Date | undefined;
-  showLabels: boolean;
   selectedClockStyle?: string;
   labelPosition?: 'top' | 'bottom';
   numberStyle?: 'fillEachDigit' | 'outlineEachDigit' | 'filled' | 'outline' | 'none';
@@ -22,7 +21,6 @@ export interface CountDownTimerProps {
 const CountDownTimer: FC<CountDownTimerProps> = ({ 
   endDate, 
   endTime, 
-  showLabels, 
   selectedClockStyle, 
   labelPosition = 'bottom',
   numberStyle = 'filled',
@@ -173,7 +171,7 @@ const CountDownTimer: FC<CountDownTimerProps> = ({
         direction="vertical"
         gap="SP1"
       >
-        {labelPosition === 'top' && showLabels && (
+        {labelPosition === 'top' && (
           <Text size={textSize} weight="normal" style={{ color: color, opacity: 0.8 }}>
             {label}
           </Text>
@@ -183,7 +181,7 @@ const CountDownTimer: FC<CountDownTimerProps> = ({
           {value}
         </Text>
         </div>
-        {labelPosition === 'bottom' && showLabels && (
+        {labelPosition === 'bottom' && (
           <Text size={textSize} weight="normal" style={{ color: color, opacity: 0.8 }}>
             {label}
           </Text>
