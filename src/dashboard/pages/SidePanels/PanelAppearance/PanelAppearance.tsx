@@ -334,6 +334,105 @@ const PanelAppearance: React.FC<Props> = ({
     ];
 
     // Theme background images for the carousel
+    // Theme configuration mapping
+    const themeConfigMap: Record<string, TimerConfig['themeConfig']> = {
+        'theme-1': {
+            backgroundType: 'image',
+            backgroundColor: '#000000',
+            backgroundOpacity: 100,
+            titleColor: '#FFFFFF',
+            titleOpacity: 100,
+            subtitleColor: '#FFD700',
+            subtitleOpacity: 100,
+            countdownLabelColor: '#FFFFFF',
+            countdownLabelOpacity: 100,
+            countdownBoxBackgroundColor: '#FF0000',
+            countdownBoxBackgroundOpacity: 100,
+            countdownBoxTextColor: '#FFFFFF',
+            countdownBoxTextOpacity: 100,
+            buttonBackgroundColor: '#FFD700',
+            buttonBackgroundOpacity: 100,
+            buttonTextColor: '#000000',
+            buttonTextOpacity: 100,
+        },
+        'theme-2': {
+            backgroundType: 'image',
+            backgroundColor: '#1a1a1a',
+            backgroundOpacity: 100,
+            titleColor: '#FF6B35',
+            titleOpacity: 100,
+            subtitleColor: '#FFA500',
+            subtitleOpacity: 100,
+            countdownLabelColor: '#FFFFFF',
+            countdownLabelOpacity: 100,
+            countdownBoxBackgroundColor: '#FF6B35',
+            countdownBoxBackgroundOpacity: 100,
+            countdownBoxTextColor: '#FFFFFF',
+            countdownBoxTextOpacity: 100,
+            buttonBackgroundColor: '#FFA500',
+            buttonBackgroundOpacity: 100,
+            buttonTextColor: '#000000',
+            buttonTextOpacity: 100,
+        },
+        'theme-3': {
+            backgroundType: 'image',
+            backgroundColor: '#0066CC',
+            backgroundOpacity: 100,
+            titleColor: '#FFFFFF',
+            titleOpacity: 100,
+            subtitleColor: '#FFD700',
+            subtitleOpacity: 100,
+            countdownLabelColor: '#FFFFFF',
+            countdownLabelOpacity: 100,
+            countdownBoxBackgroundColor: '#0066CC',
+            countdownBoxBackgroundOpacity: 100,
+            countdownBoxTextColor: '#FFFFFF',
+            countdownBoxTextOpacity: 100,
+            buttonBackgroundColor: '#FFD700',
+            buttonBackgroundOpacity: 100,
+            buttonTextColor: '#000000',
+            buttonTextOpacity: 100,
+        },
+        'theme-4': {
+            backgroundType: 'image',
+            backgroundColor: '#C8102E',
+            backgroundOpacity: 100,
+            titleColor: '#FFFFFF',
+            titleOpacity: 100,
+            subtitleColor: '#228B22',
+            subtitleOpacity: 100,
+            countdownLabelColor: '#FFFFFF',
+            countdownLabelOpacity: 100,
+            countdownBoxBackgroundColor: '#C8102E',
+            countdownBoxBackgroundOpacity: 100,
+            countdownBoxTextColor: '#FFFFFF',
+            countdownBoxTextOpacity: 100,
+            buttonBackgroundColor: '#228B22',
+            buttonBackgroundOpacity: 100,
+            buttonTextColor: '#FFFFFF',
+            buttonTextOpacity: 100,
+        },
+        'theme-5': {
+            backgroundType: 'image',
+            backgroundColor: '#0D5D56',
+            backgroundOpacity: 100,
+            titleColor: '#FFFFFF',
+            titleOpacity: 100,
+            subtitleColor: '#FFD700',
+            subtitleOpacity: 100,
+            countdownLabelColor: '#FFFFFF',
+            countdownLabelOpacity: 100,
+            countdownBoxBackgroundColor: '#0D5D56',
+            countdownBoxBackgroundOpacity: 100,
+            countdownBoxTextColor: '#FFFFFF',
+            countdownBoxTextOpacity: 100,
+            buttonBackgroundColor: '#FFD700',
+            buttonBackgroundOpacity: 100,
+            buttonTextColor: '#000000',
+            buttonTextOpacity: 100,
+        },
+    };
+
     const themeItems: CarouselItem[] = [
         {
             id: "theme-1",
@@ -548,7 +647,15 @@ const PanelAppearance: React.FC<Props> = ({
                                     onSlideChange={(index: number) => {
                                         const selectedTheme = themeItems[index]?.id;
                                         if (selectedTheme) {
-                                            onChange({ ...config, selectedTheme });
+                                            const themeConfig = themeConfigMap[selectedTheme];
+                                            onChange({ 
+                                                ...config, 
+                                                selectedTheme,
+                                                themeConfig: themeConfig ? {
+                                                    ...config.themeConfig,
+                                                    ...themeConfig,
+                                                } : config.themeConfig,
+                                            });
                                         }
                                     }}
                                 />

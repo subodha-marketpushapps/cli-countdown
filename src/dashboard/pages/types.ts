@@ -45,6 +45,7 @@ export interface TimerConfig {
     backgroundType?: 'color' | 'image';
     backgroundColor?: string;
     backgroundOpacity?: number;
+    backgroundImageUrl?: string;
     imageOpacityColor?: string;
     imageOpacity?: number;
     titleColor?: string;

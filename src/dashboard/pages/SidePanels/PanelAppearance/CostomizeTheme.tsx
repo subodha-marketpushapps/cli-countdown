@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     Text,
@@ -30,6 +30,41 @@ const CustomizeTheme: React.FC<CustomizeThemeProps> = ({
     onBack,
 }) => {
     const [backgroundType, setBackgroundType] = useState<'color' | 'image'>('image');
+    const [imageUrl, setImageUrl] = useState<string | undefined>(config.themeConfig?.backgroundImageUrl);
+
+    // Sync imageUrl with config changes
+    useEffect(() => {
+        setImageUrl(config.themeConfig?.backgroundImageUrl);
+    }, [config.themeConfig?.backgroundImageUrl]);
+
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const result = reader.result as string;
+                setImageUrl(result);
+                onChange({
+                    ...config,
+                    themeConfig: {
+                        ...config.themeConfig,
+                        backgroundImageUrl: result,
+                    },
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleImageClick = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            handleImageUpload(e as any);
+        };
+        input.click();
+    };
 
     return (
         <SidePanel
@@ -82,7 +117,43 @@ const CustomizeTheme: React.FC<CustomizeThemeProps> = ({
                                         {/* Image Placeholder */}
                                         <Box direction="vertical" gap="8px">
                                             <Text size="small" weight="normal" secondary>Image</Text>
-                                            <Image showBorder height="160px" />
+                                            <div
+                                                style={{
+                                                    cursor: 'pointer',
+                                                    position: 'relative',
+                                                }}
+                                                onClick={handleImageClick}
+                                            >
+                                                {imageUrl ? (
+                                                    <img
+                                                        src={imageUrl}
+                                                        alt="Background"
+                                                        style={{
+                                                            width: '100%',
+                                                            height: '160px',
+                                                            objectFit: 'cover',
+                                                            border: '1px solid #E0E0E0',
+                                                            borderRadius: '8px',
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Image showBorder height="160px" />
+                                                )}
+                                                <Box
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        transform: 'translate(-50%, -50%)',
+                                                        pointerEvents: 'none',
+                                                        opacity: imageUrl ? 0.7 : 1,
+                                                    }}
+                                                >
+                                                    <Text size="small" secondary>
+                                                        {imageUrl ? 'Click to change image' : 'Click to upload image'}
+                                                    </Text>
+                                                </Box>
+                                            </div>
                                         </Box>
 
 
