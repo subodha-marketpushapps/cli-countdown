@@ -20,6 +20,10 @@ interface WidgetEditorHeaderProps {
   isSaving: boolean;
   isPublishing: boolean;
   isDataLoaded: boolean;
+  viewType?: 'desktopView' | 'mobileView';
+  backgroundMode?: 'clean' | 'website';
+  onViewTypeChange?: (viewType: 'desktopView' | 'mobileView') => void;
+  onBackgroundModeChange?: (backgroundMode: 'clean' | 'website') => void;
 }
 
 const WidgetEditorHeader: React.FC<WidgetEditorHeaderProps> = ({
@@ -30,19 +34,42 @@ const WidgetEditorHeader: React.FC<WidgetEditorHeaderProps> = ({
   isSaving,
   isPublishing,
   isDataLoaded,
+  viewType: externalViewType,
+  backgroundMode: externalBackgroundMode,
+  onViewTypeChange,
+  onBackgroundModeChange,
 }) => {
-  const [viewType, setViewType] = useState<"desktopView" | "mobileView">("desktopView");
-  const [backgroundMode, setBackgroundMode] = useState<"clean" | "website">("website");
+  const [internalViewType, setInternalViewType] = useState<"desktopView" | "mobileView">("desktopView");
+  const [internalBackgroundMode, setInternalBackgroundMode] = useState<"clean" | "website">("website");
+
+  // Use external state if provided, otherwise use internal state
+  const viewType = externalViewType ?? internalViewType;
+  const backgroundMode = externalBackgroundMode ?? internalBackgroundMode;
 
   const changeViewType = (value: string) => {
-    setViewType(value as "desktopView" | "mobileView");
+    const newViewType = value as "desktopView" | "mobileView";
+    if (onViewTypeChange) {
+      onViewTypeChange(newViewType);
+    } else {
+      setInternalViewType(newViewType);
+    }
     if (value === "mobileView") {
-      setBackgroundMode("clean");
+      const newBackgroundMode = "clean" as "clean" | "website";
+      if (onBackgroundModeChange) {
+        onBackgroundModeChange(newBackgroundMode);
+      } else {
+        setInternalBackgroundMode(newBackgroundMode);
+      }
     }
   };
 
   const changeBackgroundMode = (value: string) => {
-    setBackgroundMode(value as "clean" | "website");
+    const newBackgroundMode = value as "clean" | "website";
+    if (onBackgroundModeChange) {
+      onBackgroundModeChange(newBackgroundMode);
+    } else {
+      setInternalBackgroundMode(newBackgroundMode);
+    }
   };
 
   return (

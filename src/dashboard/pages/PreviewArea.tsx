@@ -8,9 +8,17 @@ interface PreviewAreaProps {
   config: TimerConfig;
   endDate: Date | undefined;
   endTime: Date | undefined;
+  viewType?: 'desktopView' | 'mobileView';
+  backgroundMode?: 'clean' | 'website';
 }
 
-const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) => {
+const PreviewArea: React.FC<PreviewAreaProps> = ({ 
+  config, 
+  endDate, 
+  endTime, 
+  viewType = 'desktopView',
+  backgroundMode = 'website'
+}) => {
   const [isOverlayClosed, setIsOverlayClosed] = useState(false);
 
   // Get positioning styles based on placement
@@ -113,6 +121,56 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
     setIsOverlayClosed(false);
   }, [config.placement]);
 
+  // Get container styles based on view type and background mode
+  const getContainerStyles = (): React.CSSProperties => {
+    const baseStyle: React.CSSProperties = {
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+      transform: 'none',
+    };
+
+    if (viewType === 'mobileView') {
+      return {
+        ...baseStyle,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: backgroundMode === 'clean' ? '#F5F5F5' : '#FFFFFF96',
+      };
+    }
+
+    return {
+      ...baseStyle,
+      backgroundColor: backgroundMode === 'clean' ? '#F5F5F5' : '#FFFFFF96',
+    };
+  };
+
+  // Get preview wrapper styles for mobile view
+  const getPreviewWrapperStyles = (): React.CSSProperties => {
+    if (viewType === 'mobileView') {
+      return {
+        width: '375px',
+        height: '667px',
+        backgroundColor: '#FFFFFF',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        position: 'relative',
+        transform: 'scale(0.8)',
+        transformOrigin: 'center',
+      };
+    }
+
+    return {
+      width: '100%',
+      height: '100%',
+      position: 'relative',
+      flex: '1',
+    };
+  };
+
   // Don't render banner if overlay is closed
   if (config.placement === 'centered_overlay' && isOverlayClosed) {
     return (
@@ -120,24 +178,27 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
         flex="1"
         height="100%"
         width="100%"
-        backgroundColor="#FFFFFF96"
         position="relative"
-        style={containerStyle}
+        style={getContainerStyles()}
         borderRadius="0px"
       >
         <Box
-          width="100%"
-          height="100%"
-          position="relative"
-          style={{
-            padding: '20px',
-            minHeight: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+          style={getPreviewWrapperStyles()}
         >
-          <Text secondary>Overlay closed. Change placement to show preview.</Text>
+          <Box
+            width="100%"
+            height="100%"
+            position="relative"
+            style={{
+              padding: '20px',
+              minHeight: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text secondary>Overlay closed. Change placement to show preview.</Text>
+          </Box>
         </Box>
       </Box>
     );
@@ -148,21 +209,26 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
       flex="1"
       height="100%"
       width="100%"
-      backgroundColor="#FFFFFF96"
       position="relative"
-      style={containerStyle}
+      style={{
+        ...getContainerStyles(),
+        minWidth: 0,
+      }}
       borderRadius="0px"    
     >
       {renderOverlayBackdrop()}
       <Box
-        width="100%"
-        height="100%"
-        position="relative"
-        style={{
-          padding: config.placement === 'centered_overlay' ? '0' : '20px',
-          minHeight: '100%',
-        }}
+        style={getPreviewWrapperStyles()}
       >
+        <Box
+          width="100%"
+          height="100%"
+          position="relative"
+          style={{
+            padding: config.placement === 'centered_overlay' ? '0' : '20px',
+            minHeight: '100%',
+          }}
+        >
         {config.placement === 'centered_overlay' && (
               <IconButton
                 skin="dark"
@@ -215,6 +281,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
             )}
           </div>
         </div>
+        </Box>
       </Box>
     </Box>
   );

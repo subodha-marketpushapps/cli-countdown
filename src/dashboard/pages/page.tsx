@@ -29,6 +29,8 @@ const Index: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [viewType, setViewType] = useState<'desktopView' | 'mobileView'>('desktopView');
+  const [backgroundMode, setBackgroundMode] = useState<'clean' | 'website'>('website');
 
   const [config, setConfig] = useState<TimerConfig>({
     timerMode: 'start-to-finish-timer',
@@ -384,6 +386,10 @@ const Index: FC = () => {
             isSaving={isSaving}
             isPublishing={isPublishing}
             isDataLoaded={!isLoading}
+            viewType={viewType}
+            backgroundMode={backgroundMode}
+            onViewTypeChange={setViewType}
+            onBackgroundModeChange={setBackgroundMode}
           />
         </Cell>
         <Cell>
@@ -440,14 +446,18 @@ const Index: FC = () => {
               </SidePanelContainer>
 
               {/* Preview Area */}
-              <div style={{ width: '100%', height: '100%', margin: '16px' }}>
-                <PreviewArea
-                  config={config}
-                  endDate={config.timerConfig?.endDate}
-                  endTime={config.timerConfig?.endTime}
-                />
+              <div style={{ width: '100%', height: '100%', minWidth: 0, margin: '16px' }}>
+                <Box flex="1" style={{ width: '100%', height: '100%', minWidth: 0, margin: '16px' }}>
+                  <PreviewArea
+                    config={config}
+                    endDate={config.timerConfig?.endDate}
+                    endTime={config.timerConfig?.endTime}
+                    viewType={viewType}
+                    backgroundMode={backgroundMode}
+                  />
+                </Box>
               </div>
-
+                    
                     </Box>
           )}
             </Cell>
