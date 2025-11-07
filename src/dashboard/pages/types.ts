@@ -13,11 +13,13 @@ export interface TimerConfig {
       showSeconds?: boolean;
     };
   };
-  format: 'full' | 'compact' | 'minimal';
   showLabels: boolean;
-  size: 'small' | 'medium' | 'large';
   placement: 'top' | 'center' | 'bottom';
   title: string;
   message: string;
+  // Appearance settings
+  selectedTemplate?: string;
+  selectedClockStyle?: string;
+  selectedTheme?: string;
 }
 

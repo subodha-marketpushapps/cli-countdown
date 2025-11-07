@@ -9,9 +9,8 @@ interface PreviewAreaProps {
   CountDownTimer: React.FC<{
     endDate: Date | undefined;
     endTime: Date | undefined;
-    format: 'full' | 'compact' | 'minimal';
     showLabels: boolean;
-    size: 'small' | 'medium' | 'large';
+    selectedClockStyle?: string;
   }>;
 }
 
@@ -53,9 +52,8 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime, Cou
             <CountDownTimer
               endDate={endDate}
               endTime={endTime}
-              format={config.format}
               showLabels={config.showLabels}
-              size={config.size}
+              selectedClockStyle={config.selectedClockStyle}
             />
             <Box>
                 <Button priority="primary" >Shop Now</Button>

@@ -30,33 +30,6 @@ const PanelTimer: React.FC<Props> = ({
     onCloseButtonClick();
   };
 
-  const formatOptions = [
-    { id: 0, value: 'Full' },
-    { id: 1, value: 'Compact' },
-    { id: 2, value: 'Minimal' },
-  ];
-
-  const sizeOptions = [
-    { id: 0, value: 'Small' },
-    { id: 1, value: 'Medium' },
-    { id: 2, value: 'Large' },
-  ];
-
-  const handleFormatChange = (option: any) => {
-    const formats: ('full' | 'compact' | 'minimal')[] = ['full', 'compact', 'minimal'];
-    const id = typeof option.id === 'number' ? option.id : parseInt(String(option.id), 10);
-    if (id >= 0 && id < formats.length) {
-      onChange({ ...config, format: formats[id] });
-    }
-  };
-
-  const handleSizeChange = (option: any) => {
-    const sizes: ('small' | 'medium' | 'large')[] = ['small', 'medium', 'large'];
-    const id = typeof option.id === 'number' ? option.id : parseInt(String(option.id), 10);
-    if (id >= 0 && id < sizes.length) {
-      onChange({ ...config, size: sizes[id] });
-    }
-  };
 
 
   return (
@@ -203,32 +176,6 @@ const PanelTimer: React.FC<Props> = ({
                   />
                 </Layout>
               </Box>
-            </FormField>
-          </SidePanel.Field>
-        </SidePanel.Section>
-
-        <SidePanel.Section title={renderSectionTitle("Display Format", "Choose how the countdown timer is displayed.")}>
-          <SidePanel.Field>
-            <FormField>
-              <Dropdown
-                size="small"
-                options={formatOptions}
-                selectedId={config.format === 'full' ? 0 : config.format === 'compact' ? 1 : 2}
-                onSelect={handleFormatChange}
-              />
-            </FormField>
-          </SidePanel.Field>
-        </SidePanel.Section>
-
-        <SidePanel.Section title={renderSectionTitle("Size", "Adjust the size of the countdown timer.")}>
-          <SidePanel.Field>
-            <FormField>
-              <Dropdown
-                size="small"
-                options={sizeOptions}
-                selectedId={config.size === 'small' ? 0 : config.size === 'medium' ? 1 : 2}
-                onSelect={handleSizeChange}
-              />
             </FormField>
           </SidePanel.Field>
         </SidePanel.Section>

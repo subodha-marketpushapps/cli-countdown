@@ -14,7 +14,7 @@ import {
 import '@wix/design-system/styles.global.css';
 import * as Icons from '@wix/wix-ui-icons-common';
 import SidePanelContainer from './SidePanels/SidePanelContainer';
-import { PanelTimer, PanelContent, PanelPosition } from './SidePanels';
+import { PanelTimer, PanelContent, PanelPosition, PanelAppearance } from './SidePanels';
 import WidgetEditorHeader from './WidgetEditorHeader';
 import PreviewArea from './PreviewArea';
 
@@ -33,10 +33,9 @@ interface TimeRemaining {
 const CountDownTimer: FC<{
   endDate: Date | undefined;
   endTime: Date | undefined;
-  format: 'full' | 'compact' | 'minimal';
   showLabels: boolean;
-  size: 'small' | 'medium' | 'large';
-}> = ({ endDate, endTime, format, showLabels, size }) => {
+  selectedClockStyle?: string;
+}> = ({ endDate, endTime, showLabels, selectedClockStyle }) => {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     days: 0,
     hours: 0,
@@ -106,56 +105,13 @@ const CountDownTimer: FC<{
     );
   }
 
-  const textSize: 'tiny' | 'small' | 'medium' = size === 'large' ? 'medium' : size === 'medium' ? 'medium' : 'small';
-  const numberSize: 'tiny' | 'small' | 'medium' = size === 'large' ? 'medium' : size === 'medium' ? 'medium' : 'small';
+  // Default to medium size
+  const textSize: 'tiny' | 'small' | 'medium' = 'small';
+  const numberSize: 'tiny' | 'small' | 'medium' = 'medium';
 
-  if (format === 'minimal') {
-    return (
-      <Box align="center" verticalAlign="middle" padding="SP6">
-        <Text weight="bold" size={numberSize}>
-          {timeRemaining.days}d {timeRemaining.hours}h {timeRemaining.minutes}m {timeRemaining.seconds}s
-        </Text>
-      </Box>
-    );
-  }
-
-  if (format === 'compact') {
-    return (
-      <Box align="center" verticalAlign="middle" padding="SP6" gap="SP2">
-        <Box direction="horizontal" gap="SP4" align="center">
-          <Box align="center">
-            <Text weight="bold" size={numberSize}>
-              {String(timeRemaining.days).padStart(2, '0')}
-            </Text>
-            {showLabels && <Text size={textSize} secondary>Days</Text>}
-          </Box>
-          <Text size={numberSize}>:</Text>
-          <Box align="center">
-            <Text weight="bold" size={numberSize}>
-              {String(timeRemaining.hours).padStart(2, '0')}
-            </Text>
-            {showLabels && <Text size={textSize} secondary>Hours</Text>}
-          </Box>
-          <Text size={numberSize}>:</Text>
-          <Box align="center">
-            <Text weight="bold" size={numberSize}>
-              {String(timeRemaining.minutes).padStart(2, '0')}
-            </Text>
-            {showLabels && <Text size={textSize} secondary>Minutes</Text>}
-          </Box>
-          <Text size={numberSize}>:</Text>
-          <Box align="center">
-            <Text weight="bold" size={numberSize}>
-              {String(timeRemaining.seconds).padStart(2, '0')}
-            </Text>
-            {showLabels && <Text size={textSize} secondary>Seconds</Text>}
-          </Box>
-        </Box>
-      </Box>
-    );
-  }
-
-  // Full format
+  // Use selectedClockStyle to determine format, default to 'full'
+  // For now, we'll use a simple full format display
+  // The actual clock style rendering should be handled by the Clock component from PanelAppearance
   return (
     <Box align="center" verticalAlign="middle" padding="SP6" gap="SP4">
       <Layout cols={4} gap="SP3">
@@ -245,19 +201,21 @@ const Index: FC = () => {
         showSeconds: true,
       },
     },
-    format: 'full',
     showLabels: true,
-    size: 'medium',
     placement: 'top',
     title: 'Countdown Timer',
     message: 'Time remaining until the event',
+    selectedTemplate: 'template-1',
+    selectedClockStyle: '1',
+    selectedTheme: 'theme-1',
   });
 
   // Sidebar items
   const sidebarItems = [
     { id: 0, label: "Timer", icon: <Icons.Timer /> },
     { id: 1, label: "Content", icon: <Icons.SiteContent /> },
-    { id: 2, label: "Position", icon: <Icons.Pin /> },
+    { id: 2, label: "Appearance", icon: <Icons.Template /> },
+    { id: 3, label: "Position", icon: <Icons.Pin /> },
   ];
 
   const handleConfigChange = useCallback((newConfig: TimerConfig) => {
@@ -325,9 +283,15 @@ const Index: FC = () => {
             }
           }
 
-          // Load format
-          if (params.format && ['full', 'compact', 'minimal'].includes(params.format as string)) {
-            loadedConfig.format = params.format as 'full' | 'compact' | 'minimal';
+          // Load appearance settings
+          if (params.selectedTemplate) {
+            loadedConfig.selectedTemplate = params.selectedTemplate as string;
+          }
+          if (params.selectedClockStyle) {
+            loadedConfig.selectedClockStyle = params.selectedClockStyle as string;
+          }
+          if (params.selectedTheme) {
+            loadedConfig.selectedTheme = params.selectedTheme as string;
           }
 
           // Load show labels
@@ -338,11 +302,6 @@ const Index: FC = () => {
             } else if (typeof showLabelsValue === 'string') {
               loadedConfig.showLabels = showLabelsValue === 'true' || showLabelsValue.toLowerCase() === 'true';
             }
-          }
-
-          // Load size
-          if (params.size && ['small', 'medium', 'large'].includes(params.size as string)) {
-            loadedConfig.size = params.size as 'small' | 'medium' | 'large';
           }
 
           // Load placement
@@ -385,12 +344,13 @@ const Index: FC = () => {
       setIsSaving(true);
       const scriptParameters: any = {
         timerMode: config.timerMode,
-        format: config.format,
         showLabels: config.showLabels.toString(),
-        size: config.size,
         placement: config.placement,
         title: config.title || 'Countdown Timer',
         message: config.message || '',
+        selectedTemplate: config.selectedTemplate || 'template-1',
+        selectedClockStyle: config.selectedClockStyle || '1',
+        selectedTheme: config.selectedTheme || 'theme-1',
       };
 
       // Include timerConfig if it exists
@@ -517,6 +477,13 @@ const Index: FC = () => {
                     />
                   )}
                   {selectedSidebar === 2 && (
+                    <PanelAppearance
+                      config={config}
+                      onChange={handleConfigChange}
+                      onCloseButtonClick={() => setSelectedSidebar(-1)}
+                    />
+                  )}
+                  {selectedSidebar === 3 && (
                     <PanelPosition
                       config={config}
                       onChange={handleConfigChange}
