@@ -16,6 +16,14 @@ export interface TimerConfig {
   placement: 'centered_overlay' | 'static_top' | 'floating_top' | 'floating_bottom';
   title: string;
   message: string;
+  // Content settings
+  subtitle?: string;
+  showButton?: boolean;
+  buttonText?: string;
+  buttonLink?: string;
+  makeEntireTimerClickable?: boolean;
+  openInNewTab?: boolean;
+  showCloseButton?: boolean;
   // Appearance settings
   selectedTemplate?: string;
   selectedClockStyle?: string;

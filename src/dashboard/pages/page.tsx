@@ -180,6 +180,74 @@ const Index: FC = () => {
             loadedConfig.message = params.message as string;
           }
 
+          // Load content settings
+          if (params.subtitle !== undefined) {
+            loadedConfig.subtitle = params.subtitle as string;
+          }
+          if (params.showButton !== undefined) {
+            const showButtonValue = params.showButton;
+            if (typeof showButtonValue === 'boolean') {
+              loadedConfig.showButton = showButtonValue;
+            } else if (typeof showButtonValue === 'string') {
+              loadedConfig.showButton = showButtonValue === 'true' || showButtonValue.toLowerCase() === 'true';
+            }
+          }
+          if (params.buttonText !== undefined) {
+            loadedConfig.buttonText = params.buttonText as string;
+          }
+          if (params.buttonLink !== undefined) {
+            loadedConfig.buttonLink = params.buttonLink as string;
+          }
+          if (params.makeEntireTimerClickable !== undefined) {
+            const makeEntireTimerClickableValue = params.makeEntireTimerClickable;
+            if (typeof makeEntireTimerClickableValue === 'boolean') {
+              loadedConfig.makeEntireTimerClickable = makeEntireTimerClickableValue;
+            } else if (typeof makeEntireTimerClickableValue === 'string') {
+              loadedConfig.makeEntireTimerClickable = makeEntireTimerClickableValue === 'true' || makeEntireTimerClickableValue.toLowerCase() === 'true';
+            }
+          }
+          if (params.openInNewTab !== undefined) {
+            const openInNewTabValue = params.openInNewTab;
+            if (typeof openInNewTabValue === 'boolean') {
+              loadedConfig.openInNewTab = openInNewTabValue;
+            } else if (typeof openInNewTabValue === 'string') {
+              loadedConfig.openInNewTab = openInNewTabValue === 'true' || openInNewTabValue.toLowerCase() === 'true';
+            }
+          }
+          if (params.showCloseButton !== undefined) {
+            const showCloseButtonValue = params.showCloseButton;
+            if (typeof showCloseButtonValue === 'boolean') {
+              loadedConfig.showCloseButton = showCloseButtonValue;
+            } else if (typeof showCloseButtonValue === 'string') {
+              loadedConfig.showCloseButton = showCloseButtonValue === 'true' || showCloseButtonValue.toLowerCase() === 'true';
+            }
+          }
+
+          // Load actionConfig if available (handle both object and stringified JSON)
+          if (params.actionConfig) {
+            let actionConfig: any;
+            if (typeof params.actionConfig === 'string') {
+              try {
+                actionConfig = JSON.parse(params.actionConfig);
+              } catch (e) {
+                console.warn('Failed to parse actionConfig string:', e);
+                actionConfig = null;
+              }
+            } else if (typeof params.actionConfig === 'object') {
+              actionConfig = params.actionConfig;
+            }
+
+            if (actionConfig) {
+              loadedConfig.actionConfig = {
+                action: actionConfig.action,
+                message: actionConfig.message,
+                showCountries: actionConfig.showCountries,
+                showButton: actionConfig.showButton,
+                redirectUrl: actionConfig.redirectUrl,
+              };
+            }
+          }
+
           setConfig(loadedConfig);
         }
       } catch (error: any) {
@@ -208,6 +276,13 @@ const Index: FC = () => {
         placement: config.placement,
         title: config.title || 'Countdown Timer',
         message: config.message || '',
+        subtitle: config.subtitle || '',
+        showButton: config.showButton ?? true,
+        buttonText: config.buttonText || '',
+        buttonLink: config.buttonLink || '',
+        makeEntireTimerClickable: config.makeEntireTimerClickable ?? false,
+        openInNewTab: config.openInNewTab ?? true,
+        showCloseButton: config.showCloseButton ?? true,
         selectedTemplate: config.selectedTemplate || 'template-1',
         selectedClockStyle: config.selectedClockStyle || '1',
         selectedTheme: config.selectedTheme || 'theme-1',
@@ -217,9 +292,9 @@ const Index: FC = () => {
         textColor: config.textColor || '#000000',
       };
 
-      // Include timerConfig if it exists
+      // Include timerConfig if it exists (stringify it for template rendering)
       if (config.timerConfig) {
-        scriptParameters.timerConfig = {
+        const timerConfigObj = {
           startDate: config.timerConfig.startDate ? config.timerConfig.startDate.toISOString() : undefined,
           endDate: config.timerConfig.endDate ? config.timerConfig.endDate.toISOString() : undefined,
           startTime: config.timerConfig.startTime ? config.timerConfig.startTime.toISOString() : undefined,
@@ -227,6 +302,13 @@ const Index: FC = () => {
           timeZone: config.timerConfig.timeZone,
           displayOptions: config.timerConfig.displayOptions,
         };
+        // Stringify for template rendering - Wix will render this as a string in the data attribute
+        scriptParameters.timerConfig = JSON.stringify(timerConfigObj);
+      }
+
+      // Include actionConfig if it exists
+      if (config.actionConfig) {
+        scriptParameters.actionConfig = JSON.stringify(config.actionConfig);
       }
 
       // Check if script is already embedded

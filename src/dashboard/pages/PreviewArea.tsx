@@ -208,9 +208,11 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime }) =
               backgroundColor={config.backgroundColor}
               textColor={config.textColor}
             />
-            <Box style={{ flexShrink: 0, flex:1, justifyContent: 'flex-end' }}>
-              <Button priority="primary">Shop Now</Button>
-            </Box>
+            {config.showButton !== false && (
+              <Box style={{ flexShrink: 0, flex:1, justifyContent: 'flex-end' }}>
+                <Button priority="primary">{config.buttonText || 'Shop Now'}</Button>
+              </Box>
+            )}
           </div>
         </div>
       </Box>
