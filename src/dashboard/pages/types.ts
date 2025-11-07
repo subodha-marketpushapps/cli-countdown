@@ -14,7 +14,7 @@ export interface TimerConfig {
     };
   };
   showLabels: boolean;
-  placement: 'top' | 'center' | 'bottom';
+  placement: 'centered_overlay' | 'static_top' | 'floating_top' | 'floating_bottom';
   title: string;
   message: string;
   // Appearance settings
@@ -22,5 +22,8 @@ export interface TimerConfig {
   selectedClockStyle?: string;
   selectedTheme?: string;
   labelPosition?: 'top' | 'bottom';
+  numberStyle?: 'fillEachDigit' | 'outlineEachDigit' | 'filled' | 'outline' | 'none';
+  backgroundColor?: string;
+  textColor?: string;
 }
 

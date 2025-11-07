@@ -190,13 +190,16 @@ const Carousel: React.FC<CarouselProps> = ({
           className={`carousel-content ${isTransitioning ? "transitioning" : ""}`}
           width="100%"
           align="center"
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         >
-          <Box direction="vertical" align="center" gap={1}>
+          <Box direction="vertical" align="center" gap={1} style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
             {currentItem.label && (
             //   <div className="carousel-label">{currentItem.label}</div>
-            <Text size="small" secondary>{currentItem.label}</Text>
+            <Text size="small" secondary style={{ textAlign: 'center' }}>{currentItem.label}</Text>
             )}
-            {currentItem.content}
+            <Box style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+              {currentItem.content}
+            </Box>
           </Box>
         </Box>
       </Box>

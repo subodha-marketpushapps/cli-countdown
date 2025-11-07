@@ -17,147 +17,12 @@ import SidePanelContainer from './SidePanels/SidePanelContainer';
 import { PanelTimer, PanelContent, PanelPosition, PanelAppearance } from './SidePanels';
 import WidgetEditorHeader from './WidgetEditorHeader';
 import PreviewArea from './PreviewArea';
+import CountDownTimer from './components/CountDownTimer';
 
 // Component ID from embedded.json
 const EMBEDDED_SCRIPT_COMPONENT_ID = '3a1cc044-7e31-4f0c-aefb-1113d572f101';
 
 import { TimerConfig } from './types';
-
-interface TimeRemaining {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
-
-const CountDownTimer: FC<{
-  endDate: Date | undefined;
-  endTime: Date | undefined;
-  showLabels: boolean;
-  selectedClockStyle?: string;
-  labelPosition?: 'top' | 'bottom';
-}> = ({ endDate, endTime, showLabels, selectedClockStyle, labelPosition = 'bottom' }) => {
-  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-  const [isExpired, setIsExpired] = useState(false);
-
-  useEffect(() => {
-    if (!endDate) {
-      return;
-    }
-
-    const calculateTimeRemaining = () => {
-      // Combine endDate and endTime to get the target datetime
-      const targetDate = new Date(endDate);
-      if (endTime) {
-        targetDate.setHours(endTime.getHours());
-        targetDate.setMinutes(endTime.getMinutes());
-        targetDate.setSeconds(endTime.getSeconds());
-        targetDate.setMilliseconds(endTime.getMilliseconds());
-      } else {
-        // Default to end of day if no endTime specified
-        targetDate.setHours(23, 59, 59, 0);
-      }
-
-      const now = new Date().getTime();
-      const target = targetDate.getTime();
-      const difference = target - now;
-
-      if (difference <= 0) {
-        setIsExpired(true);
-        setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      setIsExpired(false);
-      setTimeRemaining({
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((difference % (1000 * 60)) / 1000),
-      });
-    };
-
-    calculateTimeRemaining();
-    const interval = setInterval(calculateTimeRemaining, 1000);
-
-    return () => clearInterval(interval);
-  }, [endDate, endTime]);
-
-  if (!endDate) {
-    return (
-      <Box align="center" verticalAlign="middle" padding="SP6">
-        <Text secondary>Please select an end date to start the countdown</Text>
-      </Box>
-    );
-  }
-
-  if (isExpired) {
-    return (
-      <Box align="center" verticalAlign="middle" padding="SP6">
-        <Text weight="bold" size="medium">
-          Countdown Expired!
-        </Text>
-      </Box>
-    );
-  }
-
-  // Default to medium size
-  const textSize: 'tiny' | 'small' | 'medium' = 'small';
-  const numberSize: 'tiny' | 'small' | 'medium' = 'medium';
-
-  // Use selectedClockStyle to determine format, default to 'full'
-  // For now, we'll use a simple full format display
-  // The actual clock style rendering should be handled by the Clock component from PanelAppearance
-  const renderTimeUnit = (value: string, label: string) => (
-    <Box 
-      align="center" 
-      padding="SP4" 
-      backgroundColor="D80" 
-      borderRadius="4px" 
-      minWidth="60px"
-      direction="vertical"
-      gap="SP1"
-    >
-      {labelPosition === 'top' && showLabels && (
-        <Text size={textSize} secondary weight="normal">
-          {label}
-        </Text>
-      )}
-      <Text weight="bold" size={numberSize}>
-        {value}
-      </Text>
-      {labelPosition === 'bottom' && showLabels && (
-        <Text size={textSize} secondary weight="normal">
-          {label}
-        </Text>
-      )}
-    </Box>
-  );
-
-  return (
-    <Box 
-      direction="horizontal" 
-      align="center" 
-      verticalAlign="middle" 
-      padding="SP6" 
-      gap="SP2"
-      style={{ justifyContent: 'center' }}
-    >
-      {renderTimeUnit(String(timeRemaining.days).padStart(2, '0'), 'Days')}
-      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
-      {renderTimeUnit(String(timeRemaining.hours).padStart(2, '0'), 'Hours')}
-      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
-      {renderTimeUnit(String(timeRemaining.minutes).padStart(2, '0'), 'Minutes')}
-      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
-      {renderTimeUnit(String(timeRemaining.seconds).padStart(2, '0'), 'Seconds')}
-    </Box>
-  );
-};
 
 const Index: FC = () => {
   const [selectedSidebar, setSelectedSidebar] = useState<number>(0);
@@ -180,9 +45,9 @@ const Index: FC = () => {
         return date;
       })(),
       endTime: (() => {
-        const date = new Date();
+    const date = new Date();
         date.setHours(23, 59, 59, 0);
-        return date;
+    return date;
       })(),
       timeZone: 'UTC',
       displayOptions: {
@@ -193,13 +58,16 @@ const Index: FC = () => {
       },
     },
     showLabels: true,
-    placement: 'top',
+    placement: 'static_top',
     title: 'Countdown Timer',
     message: 'Time remaining until the event',
     selectedTemplate: 'template-1',
     selectedClockStyle: '1',
     selectedTheme: 'theme-1',
-    labelPosition: 'bottom',
+    labelPosition: 'top',
+    numberStyle: 'fillEachDigit',
+    backgroundColor: '#2563eb',
+    textColor: '#ffffff',
   });
 
   // Sidebar items
@@ -288,6 +156,15 @@ const Index: FC = () => {
           if (params.labelPosition && ['top', 'bottom'].includes(params.labelPosition as string)) {
             loadedConfig.labelPosition = params.labelPosition as 'top' | 'bottom';
           }
+          if (params.numberStyle && ['fillEachDigit', 'outlineEachDigit', 'filled', 'outline', 'none'].includes(params.numberStyle as string)) {
+            loadedConfig.numberStyle = params.numberStyle as 'fillEachDigit' | 'outlineEachDigit' | 'filled' | 'outline' | 'none';
+          }
+          if (params.backgroundColor) {
+            loadedConfig.backgroundColor = params.backgroundColor as string;
+          }
+          if (params.textColor) {
+            loadedConfig.textColor = params.textColor as string;
+          }
 
           // Load show labels
           if (params.showLabels !== undefined) {
@@ -300,8 +177,8 @@ const Index: FC = () => {
           }
 
           // Load placement
-          if (params.placement && ['top', 'center', 'bottom'].includes(params.placement as string)) {
-            loadedConfig.placement = params.placement as 'top' | 'center' | 'bottom';
+          if (params.placement && ['centered_overlay', 'static_top', 'floating_top', 'floating_bottom'].includes(params.placement as string)) {
+            loadedConfig.placement = params.placement as 'centered_overlay' | 'static_top' | 'floating_top' | 'floating_bottom';
           }
 
           // Load title
@@ -329,12 +206,12 @@ const Index: FC = () => {
   const handleSave = useCallback(async () => {
     try {
       if (!config.timerConfig?.endDate) {
-        dashboard.showToast({
+                              dashboard.showToast({
           message: 'Please select an end date',
-          type: 'error',
-        });
-        return;
-      }
+                                type: 'error',
+                              });
+                              return;
+                            }
 
       setIsSaving(true);
       const scriptParameters: any = {
@@ -347,6 +224,9 @@ const Index: FC = () => {
         selectedClockStyle: config.selectedClockStyle || '1',
         selectedTheme: config.selectedTheme || 'theme-1',
         labelPosition: config.labelPosition || 'bottom',
+        numberStyle: config.numberStyle || 'filled',
+        backgroundColor: config.backgroundColor || '#f0f0f0',
+        textColor: config.textColor || '#000000',
       };
 
       // Include timerConfig if it exists
@@ -374,37 +254,37 @@ const Index: FC = () => {
       }
 
       // Embed or update the script
-      await embeddedScripts.embedScript(
-        {
+                            await embeddedScripts.embedScript(
+                              {
           parameters: scriptParameters,
-          disabled: false,
-        },
-        {
-          componentId: EMBEDDED_SCRIPT_COMPONENT_ID,
-        }
-      );
+                                disabled: false,
+                              },
+                              {
+                                componentId: EMBEDDED_SCRIPT_COMPONENT_ID,
+                              }
+                            );
 
-      dashboard.showToast({
+                            dashboard.showToast({
         message: isAlreadyEmbedded
           ? 'Countdown timer widget settings have been updated on your site!'
           : 'Countdown timer widget has been embedded on your site!',
-        type: 'success',
-      });
-    } catch (error: any) {
-      console.error('Error embedding script:', error);
-
-      let errorMessage = 'Failed to embed countdown timer.';
-
-      if (error?.status === 403 || error?.statusCode === 403 || error?.response?.status === 403) {
+                              type: 'success',
+                            });
+                          } catch (error: any) {
+                            console.error('Error embedding script:', error);
+                            
+                            let errorMessage = 'Failed to embed countdown timer.';
+                            
+                            if (error?.status === 403 || error?.statusCode === 403 || error?.response?.status === 403) {
         errorMessage = 'Permission denied (403). The app needs APPS.MANAGE_EMBEDDED_SCRIPT permission.';
-      } else if (error?.message) {
-        errorMessage = `Error: ${error.message}`;
-      }
-
-      dashboard.showToast({
-        message: errorMessage,
-        type: 'error',
-      });
+                            } else if (error?.message) {
+                              errorMessage = `Error: ${error.message}`;
+                            }
+                            
+                            dashboard.showToast({
+                              message: errorMessage,
+                              type: 'error',
+                            });
     } finally {
       setIsSaving(false);
     }
@@ -445,7 +325,7 @@ const Index: FC = () => {
               width="100vw"
             >
               <Loader text="Loading settings..." size="large" />
-            </Box>
+                    </Box>
           ) : (
             <Box gap="0" height="calc(100dvh - 66px)" direction="horizontal">
               <ComposerSidebar
@@ -493,16 +373,15 @@ const Index: FC = () => {
               <div style={{ width: '100%', height: '100%', margin: '16px' }}>
                 <PreviewArea
                   config={config}
-                  CountDownTimer={CountDownTimer}
                   endDate={config.timerConfig?.endDate}
                   endTime={config.timerConfig?.endTime}
                 />
               </div>
 
-            </Box>
+                    </Box>
           )}
-        </Cell>
-      </Layout>
+            </Cell>
+          </Layout>
     </WixDesignSystemProvider>
   );
 };

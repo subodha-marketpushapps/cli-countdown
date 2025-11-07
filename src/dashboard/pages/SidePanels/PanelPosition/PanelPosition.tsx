@@ -36,17 +36,20 @@ const PanelPosition: React.FC<Props> = ({
           <FormField>
             <RadioGroup
               value={config.placement}
-              onChange={(value) => onChange({ ...config, placement: value as 'top' | 'center' | 'bottom' })}
+              onChange={(value) => onChange({ ...config, placement: value as 'centered_overlay' | 'static_top' | 'floating_top' | 'floating_bottom' })}
               display="vertical"
             >
-              <RadioGroup.Radio value="top">
-                Top (After Header)
+              <RadioGroup.Radio value="centered_overlay">
+                Centered Overlay Banner
               </RadioGroup.Radio>
-              <RadioGroup.Radio value="center">
-                Center Overlay
+              <RadioGroup.Radio value="static_top">
+                Static Top Banner
               </RadioGroup.Radio>
-              <RadioGroup.Radio value="bottom">
-                Bottom
+              <RadioGroup.Radio value="floating_top">
+                Floating Top Banner
+              </RadioGroup.Radio>
+              <RadioGroup.Radio value="floating_bottom">
+                Floating Bottom Banner
               </RadioGroup.Radio>
             </RadioGroup>
           </FormField>

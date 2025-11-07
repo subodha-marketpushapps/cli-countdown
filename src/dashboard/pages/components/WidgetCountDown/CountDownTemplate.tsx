@@ -22,6 +22,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
 }) => {
   const containerStyle: React.CSSProperties = {
     width: '100%',
+    maxWidth: '100%',
     backgroundColor: clockConfig.backgroundColor,
     padding: `${20 * scale}px`,
     borderRadius: '8px',
@@ -32,8 +33,8 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
     gap: `${16 * scale}px`,
     boxSizing: 'border-box',
     transform: `scale(${scale})`,
-    transformOrigin: 'top left',
-    marginBottom: scale < 1 ? `${(1 - scale) * 100}%` : '0',
+    transformOrigin: 'center',
+    margin: scale < 1 ? `${(1 - scale) * 50}% auto` : '0 auto',
   };
 
   const textContainerStyle: React.CSSProperties = {

@@ -103,6 +103,45 @@ const PanelAppearance: React.FC<Props> = ({
         },
     ];
 
+    // Clock Style to properties mapping
+    const clockStyleMap: Record<string, {
+        numberStyle: 'fillEachDigit' | 'outlineEachDigit' | 'filled' | 'outline' | 'none';
+        backgroundColor: string;
+        textColor: string;
+        labelPosition: 'top' | 'bottom';
+    }> = {
+        '1': {
+            numberStyle: 'fillEachDigit',
+            backgroundColor: '#2563eb',
+            textColor: '#ffffff',
+            labelPosition: 'top',
+        },
+        '2': {
+            numberStyle: 'outlineEachDigit',
+            backgroundColor: '#2563eb',
+            textColor: '#2563eb',
+            labelPosition: 'bottom',
+        },
+        '3': {
+            numberStyle: 'filled',
+            backgroundColor: '#10b981',
+            textColor: '#ffffff',
+            labelPosition: 'bottom',
+        },
+        '4': {
+            numberStyle: 'outline',
+            backgroundColor: '#f59e0b',
+            textColor: '#f59e0b',
+            labelPosition: 'bottom',
+        },
+        '5': {
+            numberStyle: 'none',
+            backgroundColor: '#6366f1',
+            textColor: '#6366f1',
+            labelPosition: 'bottom',
+        },
+    };
+
     // Clock configurations for the carousel
     const clockItems: CarouselItem[] = [
         {
@@ -293,7 +332,7 @@ const PanelAppearance: React.FC<Props> = ({
                 <SidePanel.Section title={renderSectionTitle("Template", "Chose a layout style for your countdown bar. each template changes how the text, timer and button are arranged.")}>
                     <SidePanel.Field divider={false}>
                         <FormField>
-                            <Box width="100%" direction="vertical" style={{ padding: "16px 0" }}>
+                            <div style={{margin: "20px"}}>
                                 <Carousel
                                     items={templateItems}
                                     autoSlide={false}
@@ -314,7 +353,7 @@ const PanelAppearance: React.FC<Props> = ({
                                         }
                                     }}
                                 />
-                            </Box>
+                            </div>
                         </FormField>
                     </SidePanel.Field>
                 </SidePanel.Section>
@@ -333,7 +372,19 @@ const PanelAppearance: React.FC<Props> = ({
                                     onSlideChange={(index: number) => {
                                         const selectedClockStyle = clockItems[index]?.id;
                                         if (selectedClockStyle) {
-                                            onChange({ ...config, selectedClockStyle });
+                                            const clockStyleProps = clockStyleMap[selectedClockStyle];
+                                            if (clockStyleProps) {
+                                                onChange({ 
+                                                    ...config, 
+                                                    selectedClockStyle,
+                                                    numberStyle: clockStyleProps.numberStyle,
+                                                    backgroundColor: clockStyleProps.backgroundColor,
+                                                    textColor: clockStyleProps.textColor,
+                                                    labelPosition: clockStyleProps.labelPosition,
+                                                });
+                                            } else {
+                                                onChange({ ...config, selectedClockStyle });
+                                            }
                                         }
                                     }}
                                 />
