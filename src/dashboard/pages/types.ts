@@ -40,5 +40,27 @@ export interface TimerConfig {
     showButton?: boolean;
     redirectUrl?: string;
   };
+  // Theme customization
+  themeConfig?: {
+    backgroundType?: 'color' | 'image';
+    backgroundColor?: string;
+    backgroundOpacity?: number;
+    imageOpacityColor?: string;
+    imageOpacity?: number;
+    titleColor?: string;
+    titleOpacity?: number;
+    subtitleColor?: string;
+    subtitleOpacity?: number;
+    countdownLabelColor?: string;
+    countdownLabelOpacity?: number;
+    countdownBoxBackgroundColor?: string;
+    countdownBoxBackgroundOpacity?: number;
+    countdownBoxTextColor?: string;
+    countdownBoxTextOpacity?: number;
+    buttonBackgroundColor?: string;
+    buttonBackgroundOpacity?: number;
+    buttonTextColor?: string;
+    buttonTextOpacity?: number;
+  };
 }
 

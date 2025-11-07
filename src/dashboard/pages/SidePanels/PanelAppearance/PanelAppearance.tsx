@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Layout, FormField, SidePanel, Input, Box, Text, ToggleSwitch, Image } from "@wix/design-system";
-
+import { Edit as EditIcon } from "@wix/wix-ui-icons-common";
 import { TimerConfig } from "../../types";
 import { renderSectionTitle } from "../utils/renderSectionTitle";
 import { DEFAULT_PANEL_WIDTH } from "../SidePanelContainer";
 import Clock from "../../components/WidgetCountDown/Clock";
 import CountDownTemplate, { CountdownBannerProps } from "../../components/WidgetCountDown/CountDownTemplate";
 import Carousel, { CarouselItem } from "../../components/common/Carousel";
+import CustomizeTheme from "./CostomizeTheme";
 
 // Import template background images
 import blackFridayImage from "../../../../assets/images/template-background/black_friday.png";
@@ -28,6 +29,7 @@ const PanelAppearance: React.FC<Props> = ({
     onCloseButtonClick,
     previewControl,
 }) => {
+    const [showCustomizeTheme, setShowCustomizeTheme] = useState(false);
 
     // Template to labelPosition mapping
     const templateLabelPositionMap: Record<string, 'top' | 'bottom'> = {
@@ -436,6 +438,30 @@ const PanelAppearance: React.FC<Props> = ({
         onCloseButtonClick();
     };
 
+    const handleShowCustomizeThemeModal = () => {
+        setShowCustomizeTheme(true);
+    };
+
+    const handleCloseCustomizeTheme = () => {
+        setShowCustomizeTheme(false);
+    };
+
+    const handleBackFromCustomizeTheme = () => {
+        setShowCustomizeTheme(false);
+    };
+
+    // Show CustomizeTheme panel if requested
+    if (showCustomizeTheme) {
+        return (
+            <CustomizeTheme
+                config={config}
+                onChange={onChange}
+                onClose={handleCloseCustomizeTheme}
+                onBack={handleBackFromCustomizeTheme}
+            />
+        );
+    }
+
     return (
         <SidePanel
             onCloseButtonClick={handleCloseSidePanel}
@@ -508,7 +534,7 @@ const PanelAppearance: React.FC<Props> = ({
                     </SidePanel.Field>
                 </SidePanel.Section>
 
-                <SidePanel.Section title={renderSectionTitle("Theme", "Select the visual style of your countdown (Ex: box style, minimal, inline). Only the timer design changes.")}>
+                <SidePanel.Section title={renderSectionTitle("Theme", "Select the visual style of your countdown (Ex: box style, minimal, inline). Only the timer design changes.", "Customize", (<EditIcon />), handleShowCustomizeThemeModal)}>
                     <SidePanel.Field divider={false}>
                         <FormField>
                             <Box width="100%" direction="vertical" style={{ padding: "16px 0" }}>
