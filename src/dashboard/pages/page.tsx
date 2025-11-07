@@ -35,7 +35,8 @@ const CountDownTimer: FC<{
   endTime: Date | undefined;
   showLabels: boolean;
   selectedClockStyle?: string;
-}> = ({ endDate, endTime, showLabels, selectedClockStyle }) => {
+  labelPosition?: 'top' | 'bottom';
+}> = ({ endDate, endTime, showLabels, selectedClockStyle, labelPosition = 'bottom' }) => {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     days: 0,
     hours: 0,
@@ -112,58 +113,48 @@ const CountDownTimer: FC<{
   // Use selectedClockStyle to determine format, default to 'full'
   // For now, we'll use a simple full format display
   // The actual clock style rendering should be handled by the Clock component from PanelAppearance
+  const renderTimeUnit = (value: string, label: string) => (
+    <Box 
+      align="center" 
+      padding="SP4" 
+      backgroundColor="D80" 
+      borderRadius="4px" 
+      minWidth="60px"
+      direction="vertical"
+      gap="SP1"
+    >
+      {labelPosition === 'top' && showLabels && (
+        <Text size={textSize} secondary weight="normal">
+          {label}
+        </Text>
+      )}
+      <Text weight="bold" size={numberSize}>
+        {value}
+      </Text>
+      {labelPosition === 'bottom' && showLabels && (
+        <Text size={textSize} secondary weight="normal">
+          {label}
+        </Text>
+      )}
+    </Box>
+  );
+
   return (
-    <Box align="center" verticalAlign="middle" padding="SP6" gap="SP4">
-      <Layout cols={4} gap="SP3">
-        <Cell>
-          <Box align="center" padding="SP4" backgroundColor="D80" borderRadius="4px">
-            <Text weight="bold" size={numberSize}>
-              {String(timeRemaining.days).padStart(2, '0')}
-            </Text>
-            {showLabels && (
-              <Text size={textSize} secondary weight="normal" marginTop="SP1">
-                Days
-              </Text>
-            )}
-          </Box>
-        </Cell>
-        <Cell>
-          <Box align="center" padding="SP4" backgroundColor="D80" borderRadius="4px">
-            <Text weight="bold" size={numberSize}>
-              {String(timeRemaining.hours).padStart(2, '0')}
-            </Text>
-            {showLabels && (
-              <Text size={textSize} secondary weight="normal" marginTop="SP1">
-                Hours
-              </Text>
-            )}
-          </Box>
-        </Cell>
-        <Cell>
-          <Box align="center" padding="SP4" backgroundColor="D80" borderRadius="4px">
-            <Text weight="bold" size={numberSize}>
-              {String(timeRemaining.minutes).padStart(2, '0')}
-            </Text>
-            {showLabels && (
-              <Text size={textSize} secondary weight="normal" marginTop="SP1">
-                Minutes
-              </Text>
-            )}
-          </Box>
-        </Cell>
-        <Cell>
-          <Box align="center" padding="SP4" backgroundColor="D80" borderRadius="4px">
-            <Text weight="bold" size={numberSize}>
-              {String(timeRemaining.seconds).padStart(2, '0')}
-            </Text>
-            {showLabels && (
-              <Text size={textSize} secondary weight="normal" marginTop="SP1">
-                Seconds
-              </Text>
-            )}
-          </Box>
-        </Cell>
-      </Layout>
+    <Box 
+      direction="horizontal" 
+      align="center" 
+      verticalAlign="middle" 
+      padding="SP6" 
+      gap="SP2"
+      style={{ justifyContent: 'center' }}
+    >
+      {renderTimeUnit(String(timeRemaining.days).padStart(2, '0'), 'Days')}
+      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
+      {renderTimeUnit(String(timeRemaining.hours).padStart(2, '0'), 'Hours')}
+      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
+      {renderTimeUnit(String(timeRemaining.minutes).padStart(2, '0'), 'Minutes')}
+      <Text size={numberSize} weight="bold" style={{ margin: '0 4px' }}>:</Text>
+      {renderTimeUnit(String(timeRemaining.seconds).padStart(2, '0'), 'Seconds')}
     </Box>
   );
 };
@@ -208,6 +199,7 @@ const Index: FC = () => {
     selectedTemplate: 'template-1',
     selectedClockStyle: '1',
     selectedTheme: 'theme-1',
+    labelPosition: 'bottom',
   });
 
   // Sidebar items
@@ -293,6 +285,9 @@ const Index: FC = () => {
           if (params.selectedTheme) {
             loadedConfig.selectedTheme = params.selectedTheme as string;
           }
+          if (params.labelPosition && ['top', 'bottom'].includes(params.labelPosition as string)) {
+            loadedConfig.labelPosition = params.labelPosition as 'top' | 'bottom';
+          }
 
           // Load show labels
           if (params.showLabels !== undefined) {
@@ -351,6 +346,7 @@ const Index: FC = () => {
         selectedTemplate: config.selectedTemplate || 'template-1',
         selectedClockStyle: config.selectedClockStyle || '1',
         selectedTheme: config.selectedTheme || 'theme-1',
+        labelPosition: config.labelPosition || 'bottom',
       };
 
       // Include timerConfig if it exists

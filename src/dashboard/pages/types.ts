@@ -21,5 +21,6 @@ export interface TimerConfig {
   selectedTemplate?: string;
   selectedClockStyle?: string;
   selectedTheme?: string;
+  labelPosition?: 'top' | 'bottom';
 }
 

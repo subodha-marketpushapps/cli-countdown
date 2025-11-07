@@ -11,6 +11,7 @@ interface PreviewAreaProps {
     endTime: Date | undefined;
     showLabels: boolean;
     selectedClockStyle?: string;
+    labelPosition?: 'top' | 'bottom';
   }>;
 }
 
@@ -54,6 +55,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({ config, endDate, endTime, Cou
               endTime={endTime}
               showLabels={config.showLabels}
               selectedClockStyle={config.selectedClockStyle}
+              labelPosition={config.labelPosition}
             />
             <Box>
                 <Button priority="primary" >Shop Now</Button>

@@ -29,6 +29,13 @@ const PanelAppearance: React.FC<Props> = ({
     previewControl,
 }) => {
 
+    // Template to labelPosition mapping
+    const templateLabelPositionMap: Record<string, 'top' | 'bottom'> = {
+        'template-1': 'bottom',
+        'template-2': 'top',
+        'template-3': 'bottom',
+    };
+
     // Template configurations for the carousel
     const templateItems: CarouselItem[] = [
         {
@@ -297,7 +304,13 @@ const PanelAppearance: React.FC<Props> = ({
                                     onSlideChange={(index: number) => {
                                         const selectedTemplate = templateItems[index]?.id;
                                         if (selectedTemplate) {
-                                            onChange({ ...config, selectedTemplate });
+                                            // Get labelPosition from mapping
+                                            const labelPosition = templateLabelPositionMap[selectedTemplate] || 'bottom';
+                                            onChange({ 
+                                                ...config, 
+                                                selectedTemplate,
+                                                labelPosition 
+                                            });
                                         }
                                     }}
                                 />
