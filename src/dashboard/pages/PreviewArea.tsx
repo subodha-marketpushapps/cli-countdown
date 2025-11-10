@@ -3,6 +3,7 @@ import { Box, Card, Text, InfoIcon, Button, IconButton } from '@wix/design-syste
 import * as Icons from '@wix/wix-ui-icons-common';
 import { TimerConfig } from './types';
 import CountDownTimer from './components/CountDownTimer';
+import CountDownTemplate, { TemplateLayout } from './components/WidgetCountDown/CountDownTemplate';
 
 interface PreviewAreaProps {
   config: TimerConfig;
@@ -21,19 +22,117 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
 }) => {
   const [isOverlayClosed, setIsOverlayClosed] = useState(false);
 
+  // Helper function to convert Date to time string
+  const getEndTimeString = (): string => {
+    if (endTime) {
+      const time = new Date(endTime);
+      const hours = String(time.getHours()).padStart(2, '0');
+      const minutes = String(time.getMinutes()).padStart(2, '0');
+      const seconds = String(time.getSeconds()).padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    }
+    // Default fallback: end of day
+    return "23:59:59";
+  };
+
+  // Clock Style to properties mapping (same as PanelAppearance)
+  const clockStyleMap: Record<string, {
+    numberStyle: 'fillEachDigit' | 'outlineEachDigit' | 'filled' | 'outline' | 'none';
+    backgroundColor: string;
+    textColor: string;
+    labelPosition: 'top' | 'bottom';
+  }> = {
+    '1': {
+      numberStyle: 'fillEachDigit',
+      backgroundColor: '#2563eb',
+      textColor: '#ffffff',
+      labelPosition: 'top',
+    },
+    '2': {
+      numberStyle: 'outlineEachDigit',
+      backgroundColor: '#2563eb',
+      textColor: '#2563eb',
+      labelPosition: 'bottom',
+    },
+    '3': {
+      numberStyle: 'filled',
+      backgroundColor: '#10b981',
+      textColor: '#ffffff',
+      labelPosition: 'bottom',
+    },
+    '4': {
+      numberStyle: 'outline',
+      backgroundColor: '#f59e0b',
+      textColor: '#f59e0b',
+      labelPosition: 'bottom',
+    },
+    '5': {
+      numberStyle: 'none',
+      backgroundColor: '#6366f1',
+      textColor: '#6366f1',
+      labelPosition: 'bottom',
+    },
+  };
+
+  // Template layout definitions (same as PanelAppearance)
+  const templateLayoutMap: Record<string, TemplateLayout> = {
+    'template-1': 'title-subtitle-timer-button',
+    'template-2': 'title-timer-button',
+    'template-3': 'timer-title-subtitle-button',
+    'template-4': 'title-subtitle-button-timer',
+    'template-5': 'title-timer-subtitle-button',
+    'template-6': 'vertical-title-timer-button',
+    'template-7': 'title-subtitle-timer-button',
+    'template-8': 'timer-title-subtitle-button',
+  };
+
+  // Get theme config
+  const themeConfig = config.themeConfig || {};
+
+  // Get selected clock style config
+  const getSelectedClockConfig = () => {
+    const selectedClockStyle = config.selectedClockStyle || '1';
+    const clockStyleProps = clockStyleMap[selectedClockStyle];
+    if (clockStyleProps) {
+      return {
+        labelPosition: clockStyleProps.labelPosition,
+        numberStyle: clockStyleProps.numberStyle,
+        backgroundColor: themeConfig.countdownBoxBackgroundColor || clockStyleProps.backgroundColor,
+        textColor: themeConfig.countdownBoxTextColor || clockStyleProps.textColor,
+      };
+    }
+    return {
+      labelPosition: config.labelPosition || 'bottom',
+      numberStyle: config.numberStyle || 'filled',
+      backgroundColor: themeConfig.countdownBoxBackgroundColor || '#2563eb',
+      textColor: themeConfig.countdownBoxTextColor || '#ffffff',
+    };
+  };
+
+  const selectedClockConfig = getSelectedClockConfig();
+  const selectedLayout = templateLayoutMap[config.selectedTemplate || 'template-1'] || 'title-subtitle-timer-button';
+
   // Get positioning styles based on placement
   const getPlacementStyles = (): React.CSSProperties => {
     const bannerStyle: React.CSSProperties = {
       width: '100%',
-      backgroundColor: '#FFFFFF',
+      backgroundColor: themeConfig.backgroundImageUrl 
+        ? 'transparent' 
+        : (themeConfig.backgroundColor || '#FFFFFF'),
+      backgroundImage: themeConfig.backgroundImageUrl 
+        ? `url(${themeConfig.backgroundImageUrl})` 
+        : undefined,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       display: 'flex',
       flexDirection: 'row',
       gap: '16px',
-      height: '180px',
+      minHeight: '180px',
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '24px',
       boxSizing: 'border-box',
+      position: 'relative',
     };
 
     switch (config.placement) {
@@ -252,34 +351,52 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
             )}
         {/* Countdown Timer Preview */}
         <div style={getPlacementStyles()}>
-          
-          <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-            
-            {config.message && (
-              <Box direction="vertical" gap="SP2" style={{ flex: '1', minWidth: 0 }}>
-                <Text size="medium" weight="bold" secondary>
-                  {config.title}
-                </Text>
-                <Text size="small" secondary>
-                  {config.message}
-                </Text>
-              </Box>
-            )}
-          <CountDownTimer
-            endDate={endDate}
-            endTime={endTime}
-            selectedClockStyle={config.selectedClockStyle}
-              labelPosition={config.labelPosition}
-              numberStyle={config.numberStyle}
-              backgroundColor={config.backgroundColor}
-              textColor={config.textColor}
+          {/* Background image opacity overlay */}
+          {themeConfig.backgroundImageUrl && themeConfig.imageOpacity && themeConfig.imageOpacity < 100 && (
+            <Box
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: themeConfig.imageOpacityColor || '#000000',
+                opacity: (100 - (themeConfig.imageOpacity || 100)) / 100,
+                borderRadius: config.placement === 'centered_overlay' ? '12px' : '0',
+              }}
             />
-            {config.showButton !== false && (
-              <Box style={{ flexShrink: 0, flex:1, justifyContent: 'flex-end' }}>
-                <Button priority="primary">{config.buttonText || 'Shop Now'}</Button>
-              </Box>
-            )}
-          </div>
+          )}
+          
+          <Box style={{ position: 'relative', width: '100%', zIndex: 1 }}>
+            <CountDownTemplate
+              clockConfig={{
+                labelPosition: selectedClockConfig.labelPosition,
+                numberStyle: selectedClockConfig.numberStyle,
+                endDate: endDate || new Date(),
+                endTime: getEndTimeString(),
+                backgroundColor: selectedClockConfig.backgroundColor,
+                textColor: selectedClockConfig.textColor,
+              }}
+              layout={selectedLayout}
+              title={config.title || "Flash Sale"}
+              subTitle={config.subtitle || config.message || "Limited Stock"}
+              buttonText={config.buttonText || "Shop Now"}
+              buttonLink={config.buttonLink || "https://example.com/shop"}
+              scale={1}
+              titleColor={themeConfig.titleColor}
+              titleOpacity={themeConfig.titleOpacity}
+              subtitleColor={themeConfig.subtitleColor}
+              subtitleOpacity={themeConfig.subtitleOpacity}
+              countdownBoxBackgroundColor={themeConfig.countdownBoxBackgroundColor}
+              countdownBoxBackgroundOpacity={themeConfig.countdownBoxBackgroundOpacity}
+              countdownBoxTextColor={themeConfig.countdownBoxTextColor}
+              countdownBoxTextOpacity={themeConfig.countdownBoxTextOpacity}
+              buttonBackgroundColor={themeConfig.buttonBackgroundColor}
+              buttonBackgroundOpacity={themeConfig.buttonBackgroundOpacity}
+              buttonTextColor={themeConfig.buttonTextColor}
+              buttonTextOpacity={themeConfig.buttonTextOpacity}
+            />
+          </Box>
         </div>
         </Box>
       </Box>

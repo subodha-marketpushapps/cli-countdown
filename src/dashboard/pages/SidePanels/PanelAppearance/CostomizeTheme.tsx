@@ -29,13 +29,20 @@ const CustomizeTheme: React.FC<CustomizeThemeProps> = ({
     onClose,
     onBack,
 }) => {
-    const [backgroundType, setBackgroundType] = useState<'color' | 'image'>('image');
+    const [backgroundType, setBackgroundType] = useState<'color' | 'image'>(
+        config.themeConfig?.backgroundType || (config.themeConfig?.backgroundImageUrl ? 'image' : 'color')
+    );
     const [imageUrl, setImageUrl] = useState<string | undefined>(config.themeConfig?.backgroundImageUrl);
 
-    // Sync imageUrl with config changes
+    // Sync imageUrl and backgroundType with config changes
     useEffect(() => {
         setImageUrl(config.themeConfig?.backgroundImageUrl);
-    }, [config.themeConfig?.backgroundImageUrl]);
+        if (config.themeConfig?.backgroundType) {
+            setBackgroundType(config.themeConfig.backgroundType);
+        } else if (config.themeConfig?.backgroundImageUrl) {
+            setBackgroundType('image');
+        }
+    }, [config.themeConfig?.backgroundImageUrl, config.themeConfig?.backgroundType]);
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -101,7 +108,17 @@ const CustomizeTheme: React.FC<CustomizeThemeProps> = ({
                                 <Box gap="18px" verticalAlign="middle">
                                     <SegmentedToggle
                                         selected={backgroundType}
-                                        onClick={(_, value: string) => setBackgroundType(value as 'color' | 'image')}
+                                        onClick={(_, value: string) => {
+                                            const newType = value as 'color' | 'image';
+                                            setBackgroundType(newType);
+                                            onChange({
+                                                ...config,
+                                                themeConfig: {
+                                                    ...config.themeConfig,
+                                                    backgroundType: newType,
+                                                },
+                                            });
+                                        }}
                                     >
                                         <SegmentedToggle.Icon value="color" tooltipText="Solid Color">
                                             <Icons.LayoutFull />
