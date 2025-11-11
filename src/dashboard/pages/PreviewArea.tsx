@@ -142,7 +142,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          zIndex: 10001,
+          zIndex: backgroundMode === 'website' ? 10005 : 10001,
           maxWidth: '900px',
           width: '95%',
           borderRadius: '12px',
@@ -151,11 +151,12 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
       case 'static_top':
         return {
           ...bannerStyle,
-          position: 'relative',
+          position: backgroundMode === 'website' ? 'absolute' : 'relative',
           top: 0,
           left: 0,
           right: 0,
           width: '100%',
+          zIndex: backgroundMode === 'website' ? 10005 : undefined,
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         };
       case 'floating_top':
@@ -166,7 +167,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
           left: 0,
           right: 0,
           width: '100%',
-          zIndex: 9999,
+          zIndex: backgroundMode === 'website' ? 10005 : 9999,
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         };
       case 'floating_bottom':
@@ -177,7 +178,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
           left: 0,
           right: 0,
           width: '100%',
-          zIndex: 9999,
+          zIndex: backgroundMode === 'website' ? 10005 : 9999,
           boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
         };
       default:
@@ -235,13 +236,13 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: backgroundMode === 'clean' ? '#F5F5F5' : '#FFFFFF96',
+        backgroundColor: backgroundMode === 'clean' ? '#F5F5F5' : 'transparent',
       };
     }
 
     return {
       ...baseStyle,
-      backgroundColor: backgroundMode === 'clean' ? '#F5F5F5' : '#FFFFFF96',
+      backgroundColor: backgroundMode === 'clean' ? '#F5F5F5' : 'transparent',
     };
   };
 
@@ -251,8 +252,8 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
       return {
         width: '375px',
         height: '667px',
-        backgroundColor: '#FFFFFF',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+        backgroundColor: backgroundMode === 'website' ? 'transparent' : '#FFFFFF',
+        boxShadow: backgroundMode === 'website' ? 'none' : '0 4px 20px rgba(0, 0, 0, 0.15)',
         borderRadius: '8px',
         overflow: 'hidden',
         position: 'relative',
@@ -279,6 +280,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
         position="relative"
         style={getContainerStyles()}
         borderRadius="0px"
+        margin="16px"
       >
         <Box
           style={getPreviewWrapperStyles()}
@@ -313,6 +315,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
         minWidth: 0,
       }}
       borderRadius="0px"    
+      margin="16px"
     >
       {renderOverlayBackdrop()}
       <Box
@@ -322,34 +325,42 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
           width="100%"
           height="100%"
           position="relative"
+          margin={backgroundMode === 'website' ? '0' : (config.placement === 'centered_overlay' ? '0' : '20px')}
           style={{
-            padding: config.placement === 'centered_overlay' ? '0' : '20px',
+            padding: backgroundMode === 'website' ? '0' : (config.placement === 'centered_overlay' ? '0' : '20px'),
             minHeight: '100%',
+            overflow: config.placement === 'static_top' || config.placement === 'centered_overlay' ? 'visible' : 'hidden',
           }}
         >
-        {config.placement === 'centered_overlay' && (
-              <IconButton
-                skin="dark"
-                priority="tertiary"
-                onClick={() => setIsOverlayClosed(true)}
-                style={{
-                  position: 'absolute',
-                  top: '-8px',
-                  right: '-8px',
-                  zIndex: 10002,
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  borderRadius: '50%',
-                  minWidth: '32px',
-                  width: '32px',
-                  height: '32px',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                }}
-              >
-                <Icons.X />
-              </IconButton>
-            )}
         {/* Countdown Timer Preview */}
         <div style={getPlacementStyles()}>
+          {/* Close button for centered overlay - positioned relative to the countdown timer */}
+          {config.placement === 'centered_overlay' && !isOverlayClosed && (
+            <IconButton
+              skin="dark"
+              priority="tertiary"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOverlayClosed(true);
+              }}
+              style={{
+                position: 'absolute',
+                top: '-8px',
+                right: '-8px',
+                zIndex: 10010,
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: '50%',
+                minWidth: '32px',
+                width: '32px',
+                height: '32px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+              }}
+            >
+              <Icons.X />
+            </IconButton>
+          )}
           {/* Background image opacity overlay */}
           {themeConfig.backgroundImageUrl && themeConfig.imageOpacity && themeConfig.imageOpacity < 100 && (
             <Box

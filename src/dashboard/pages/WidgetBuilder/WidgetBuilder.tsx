@@ -14,6 +14,7 @@ import * as Icons from '@wix/wix-ui-icons-common';
 import SidePanelContainer from './SidePanels/SidePanelContainer';
 import { PanelTimer, PanelContent, PanelPosition, PanelAppearance } from './SidePanels';
 import WidgetEditorHeader from './WidgetEditorHeader';
+import WidgetBuilderBackground from './WidgetBuilderBackground';
 import PreviewArea from '../PreviewArea';
 import { TimerConfig } from '../types';
 import { createDefaultTimerConfig } from '../../../constants';
@@ -414,8 +415,27 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
               </SidePanelContainer>
 
               {/* Preview Area */}
-              <div style={{ width: '100%', height: '100%', minWidth: 0, margin: '16px', backgroundColor:'#f7f7f7' }}>
-                <Box flex="1" style={{ width: '100%', height: '100%', minWidth: 0, margin: '16px' }}>
+              <Box 
+                flex="1" 
+                style={{ 
+                  marginLeft: selectedSidebar !== -1 ? '16px' : '0',
+                  transition: 'margin-left 0.2s ease',
+                }}
+              >
+                <WidgetBuilderBackground
+                  backgroundMode={backgroundMode}
+                  viewType={viewType}
+                >
+                <Box 
+                  flex="1" 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    minWidth: 0,
+                    position: 'relative',
+                    padding: backgroundMode === 'website' ? '0' : '16px',
+                  }}
+                >
                   <PreviewArea
                     config={config}
                     endDate={config.timerConfig?.endDate}
@@ -424,7 +444,8 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
                     backgroundMode={backgroundMode}
                   />
                 </Box>
-              </div>
+              </WidgetBuilderBackground>
+              </Box>
             </Box>
           )}
         </Cell>

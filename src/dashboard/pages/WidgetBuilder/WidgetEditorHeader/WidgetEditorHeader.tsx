@@ -53,14 +53,7 @@ const WidgetEditorHeader: React.FC<WidgetEditorHeaderProps> = ({
     } else {
       setInternalViewType(newViewType);
     }
-    if (value === "mobileView") {
-      const newBackgroundMode = "clean" as "clean" | "website";
-      if (onBackgroundModeChange) {
-        onBackgroundModeChange(newBackgroundMode);
-      } else {
-        setInternalBackgroundMode(newBackgroundMode);
-      }
-    }
+    // Allow website background in mobile view - don't force clean mode
   };
 
   const changeBackgroundMode = (value: string) => {
