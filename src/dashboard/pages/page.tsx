@@ -23,6 +23,7 @@ import CountDownTimer from './components/CountDownTimer';
 const EMBEDDED_SCRIPT_COMPONENT_ID = '3a1cc044-7e31-4f0c-aefb-1113d572f101';
 
 import { TimerConfig } from './types';
+import { createDefaultTimerConfig } from '../../constants';
 
 const Index: FC = () => {
   const [selectedSidebar, setSelectedSidebar] = useState<number>(0);
@@ -32,44 +33,7 @@ const Index: FC = () => {
   const [viewType, setViewType] = useState<'desktopView' | 'mobileView'>('desktopView');
   const [backgroundMode, setBackgroundMode] = useState<'clean' | 'website'>('website');
 
-  const [config, setConfig] = useState<TimerConfig>({
-    timerMode: 'start-to-finish-timer',
-    timerConfig: {
-      startDate: new Date(),
-      startTime: (() => {
-        const date = new Date();
-        date.setHours(0, 0, 0, 0);
-        return date;
-      })(),
-      endDate: (() => {
-        const date = new Date();
-        date.setDate(date.getDate() + 7);
-        return date;
-      })(),
-      endTime: (() => {
-    const date = new Date();
-        date.setHours(23, 59, 59, 0);
-    return date;
-      })(),
-      timeZone: 'UTC',
-      displayOptions: {
-        showDays: true,
-        showHours: true,
-        showMinutes: true,
-        showSeconds: true,
-      },
-    },
-    placement: 'static_top',
-    title: 'Countdown Timer',
-    message: 'Time remaining until the event',
-    selectedTemplate: 'template-1',
-    selectedClockStyle: '1',
-    selectedTheme: 'theme-1',
-    labelPosition: 'top',
-    numberStyle: 'fillEachDigit',
-    backgroundColor: '#2563eb',
-    textColor: '#ffffff',
-  });
+  const [config, setConfig] = useState<TimerConfig>(createDefaultTimerConfig());
 
   // Sidebar items
   const sidebarItems = [
