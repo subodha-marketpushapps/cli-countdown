@@ -421,6 +421,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
                   marginLeft: selectedSidebar !== -1 ? '16px' : '0',
                   transition: 'margin-left 0.2s ease',
                 }}
+                margin="16px"
               >
                 <WidgetBuilderBackground
                   backgroundMode={backgroundMode}

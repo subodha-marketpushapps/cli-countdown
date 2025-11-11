@@ -280,7 +280,6 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
         position="relative"
         style={getContainerStyles()}
         borderRadius="0px"
-        margin="16px"
       >
         <Box
           style={getPreviewWrapperStyles()}
@@ -315,9 +314,9 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
         minWidth: 0,
       }}
       borderRadius="0px"    
-      margin="16px"
+      // margin="16px"
     >
-      {renderOverlayBackdrop()}
+      {/* {renderOverlayBackdrop()} */}
       <Box
         style={getPreviewWrapperStyles()}
       >
