@@ -446,7 +446,7 @@ const Index: FC = () => {
               </SidePanelContainer>
 
               {/* Preview Area */}
-              <div style={{ width: '100%', height: '100%', minWidth: 0, margin: '16px' }}>
+              <div style={{ width: '100%', height: '100%', minWidth: 0, margin: '16px', backgroundColor:'#f7f7f7' }}>
                 <Box flex="1" style={{ width: '100%', height: '100%', minWidth: 0, margin: '16px' }}>
                   <PreviewArea
                     config={config}

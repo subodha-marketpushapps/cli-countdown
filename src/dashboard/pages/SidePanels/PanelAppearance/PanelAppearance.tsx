@@ -4,8 +4,8 @@ import { Edit as EditIcon } from "@wix/wix-ui-icons-common";
 import { TimerConfig } from "../../types";
 import { renderSectionTitle } from "../utils/renderSectionTitle";
 import { DEFAULT_PANEL_WIDTH } from "../SidePanelContainer";
-import CountDownTemplate, { CountdownBannerProps, TemplateLayout } from "../../components/WidgetCountDown/CountDownTemplate";
-import Carousel, { CarouselItem } from "../../components/common/Carousel";
+import CountDownTemplate, { CountdownBannerProps, TemplateLayout } from "../../../components/WidgetCountDown/CountDownTemplate";
+import Carousel, { CarouselItem } from "../../../components/common/Carousel";
 import CustomizeTheme from "./CostomizeTheme";
 
 // Import template background images

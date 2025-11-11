@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Box, Card, Text, InfoIcon, Button, IconButton } from '@wix/design-system';
 import * as Icons from '@wix/wix-ui-icons-common';
 import { TimerConfig } from './types';
-import CountDownTimer from './components/CountDownTimer';
-import CountDownTemplate, { TemplateLayout } from './components/WidgetCountDown/CountDownTemplate';
+import CountDownTemplate, { TemplateLayout } from '../components/WidgetCountDown/CountDownTemplate';
 
 interface PreviewAreaProps {
   config: TimerConfig;

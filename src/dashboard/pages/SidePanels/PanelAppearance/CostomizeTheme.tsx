@@ -14,7 +14,7 @@ import * as Icons from "@wix/wix-ui-icons-common";
 import { DEFAULT_PANEL_WIDTH } from "../SidePanelContainer";
 import { renderSectionTitle } from "../utils/renderSectionTitle";
 import { TimerConfig } from "../../types";
-import ColorControl from "../../components/ColorControl";
+import { InputColorOpacity } from "../../../components/FormInputs";
 
 interface CustomizeThemeProps {
     config: TimerConfig;
@@ -22,6 +22,28 @@ interface CustomizeThemeProps {
     onClose: () => void;
     onBack: () => void;
 }
+
+// Helper function to combine color and opacity into #RRGGBBAA format
+const combineColorAndOpacity = (color: string, opacity: number): string => {
+    const baseColor = color.slice(0, 7).toUpperCase();
+    const alphaHex = Math.round((opacity / 100) * 255)
+        .toString(16)
+        .padStart(2, "0")
+        .toUpperCase();
+    return `#${baseColor.replace("#", "")}${alphaHex}`;
+};
+
+// Helper function to parse #RRGGBBAA format to color and opacity
+const parseColorAndOpacity = (value: string): { color: string; opacity: number } => {
+    if (value.length === 9) {
+        const color = value.slice(0, 7);
+        const opacityHex = value.slice(7, 9);
+        const opacityValue = parseInt(opacityHex, 16);
+        const opacity = isNaN(opacityValue) ? 100 : Math.round((opacityValue / 255) * 100);
+        return { color, opacity };
+    }
+    return { color: value, opacity: 100 };
+};
 
 const CustomizeTheme: React.FC<CustomizeThemeProps> = ({
     config,
@@ -175,24 +197,20 @@ const CustomizeTheme: React.FC<CustomizeThemeProps> = ({
 
 
                                         {/* Image Opacity */}
-                                        <ColorControl
+                                        <InputColorOpacity
                                             label="Image Opacity"
-                                            color={config.themeConfig?.imageOpacityColor || '#000000'}
-                                            opacity={config.themeConfig?.imageOpacity || 100}
-                                            onColorChange={(color) => {
+                                            infoContent=""
+                                            value={combineColorAndOpacity(
+                                                config.themeConfig?.imageOpacityColor || '#000000',
+                                                config.themeConfig?.imageOpacity || 100
+                                            )}
+                                            onChange={(value) => {
+                                                const { color, opacity } = parseColorAndOpacity(value as string);
                                                 onChange({
                                                     ...config,
                                                     themeConfig: {
                                                         ...config.themeConfig,
                                                         imageOpacityColor: color,
-                                                    },
-                                                });
-                                            }}
-                                            onOpacityChange={(opacity) => {
-                                                onChange({
-                                                    ...config,
-                                                    themeConfig: {
-                                                        ...config.themeConfig,
                                                         imageOpacity: opacity,
                                                     },
                                                 });
@@ -202,24 +220,20 @@ const CustomizeTheme: React.FC<CustomizeThemeProps> = ({
                                 )}
 
                                 {/* Background Color */}
-                                <ColorControl
+                                <InputColorOpacity
                                     label={backgroundType === 'image' ? "Background Color" : "Solid Color"}
-                                    color={config.themeConfig?.backgroundColor || '#000000'}
-                                    opacity={config.themeConfig?.backgroundOpacity || 100}
-                                    onColorChange={(color) => {
+                                    infoContent=""
+                                    value={combineColorAndOpacity(
+                                        config.themeConfig?.backgroundColor || '#000000',
+                                        config.themeConfig?.backgroundOpacity || 100
+                                    )}
+                                    onChange={(value) => {
+                                        const { color, opacity } = parseColorAndOpacity(value as string);
                                         onChange({
                                             ...config,
                                             themeConfig: {
                                                 ...config.themeConfig,
                                                 backgroundColor: color,
-                                            },
-                                        });
-                                    }}
-                                    onOpacityChange={(opacity) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
                                                 backgroundOpacity: opacity,
                                             },
                                         });
@@ -232,193 +246,153 @@ const CustomizeTheme: React.FC<CustomizeThemeProps> = ({
 
                 {/* Text Colors Section */}
                 <SidePanel.Section title={renderSectionTitle("Text Colors")}>
-                    <SidePanel.Field divider={false}>
-                        <FormField>
-                            <Box direction="vertical" gap="16px">
-                                <ColorControl
-                                    label="Title Color"
-                                    color={config.themeConfig?.titleColor || '#FFD700'}
-                                    opacity={config.themeConfig?.titleOpacity || 100}
-                                    onColorChange={(color) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                titleColor: color,
-                                            },
-                                        });
-                                    }}
-                                    onOpacityChange={(opacity) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                titleOpacity: opacity,
-                                            },
-                                        });
-                                    }}
-                                />
-                                <ColorControl
-                                    label="Subtitle Color"
-                                    color={config.themeConfig?.subtitleColor || '#FFD700'}
-                                    opacity={config.themeConfig?.subtitleOpacity || 100}
-                                    onColorChange={(color) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                subtitleColor: color,
-                                            },
-                                        });
-                                    }}
-                                    onOpacityChange={(opacity) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                subtitleOpacity: opacity,
-                                            },
-                                        });
-                                    }}
-                                />
-                            </Box>
-                        </FormField>
-                    </SidePanel.Field>
+                    <Box direction="vertical" gap="16px">
+                        <InputColorOpacity
+                            label="Title Color"
+                            infoContent=""
+                            value={combineColorAndOpacity(
+                                config.themeConfig?.titleColor || '#FFD700',
+                                config.themeConfig?.titleOpacity || 100
+                            )}
+                            onChange={(value) => {
+                                const { color, opacity } = parseColorAndOpacity(value as string);
+                                onChange({
+                                    ...config,
+                                    themeConfig: {
+                                        ...config.themeConfig,
+                                        titleColor: color,
+                                        titleOpacity: opacity,
+                                    },
+                                });
+                            }}
+                        />
+                        <InputColorOpacity
+                            label="Subtitle Color"
+                            infoContent=""
+                            value={combineColorAndOpacity(
+                                config.themeConfig?.subtitleColor || '#FFD700',
+                                config.themeConfig?.subtitleOpacity || 100
+                            )}
+                            onChange={(value) => {
+                                const { color, opacity } = parseColorAndOpacity(value as string);
+                                onChange({
+                                    ...config,
+                                    themeConfig: {
+                                        ...config.themeConfig,
+                                        subtitleColor: color,
+                                        subtitleOpacity: opacity,
+                                    },
+                                });
+                            }}
+                        />
+                    </Box>
                 </SidePanel.Section>
 
                 {/* Timer Colors Section */}
                 <SidePanel.Section title={renderSectionTitle("Timer Colors")}>
-                    <SidePanel.Field divider={false}>
-                        <FormField>
-                            <Box direction="vertical" gap="16px">
-                                <ColorControl
-                                    label="Countdown Label Text"
-                                    color={config.themeConfig?.countdownLabelColor || '#FFD700'}
-                                    opacity={config.themeConfig?.countdownLabelOpacity || 100}
-                                    onColorChange={(color) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                countdownLabelColor: color,
-                                            },
-                                        });
-                                    }}
-                                    onOpacityChange={(opacity) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                countdownLabelOpacity: opacity,
-                                            },
-                                        });
-                                    }}
-                                />
-                                <ColorControl
-                                    label="Countdown Box Background"
-                                    color={config.themeConfig?.countdownBoxBackgroundColor || '#FFD700'}
-                                    opacity={config.themeConfig?.countdownBoxBackgroundOpacity || 100}
-                                    onColorChange={(color) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                countdownBoxBackgroundColor: color,
-                                            },
-                                        });
-                                    }}
-                                    onOpacityChange={(opacity) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                countdownBoxBackgroundOpacity: opacity,
-                                            },
-                                        });
-                                    }}
-                                />
-                                <ColorControl
-                                    label="Countdown Box Text"
-                                    color={config.themeConfig?.countdownBoxTextColor || '#000000'}
-                                    opacity={config.themeConfig?.countdownBoxTextOpacity || 100}
-                                    onColorChange={(color) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                countdownBoxTextColor: color,
-                                            },
-                                        });
-                                    }}
-                                    onOpacityChange={(opacity) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                countdownBoxTextOpacity: opacity,
-                                            },
-                                        });
-                                    }}
-                                />
-                            </Box>
-                        </FormField>
-                    </SidePanel.Field>
+                    <Box direction="vertical" gap="16px">
+                        <InputColorOpacity
+                            label="Countdown Label Text"
+                            infoContent=""
+                            value={combineColorAndOpacity(
+                                config.themeConfig?.countdownLabelColor || '#FFD700',
+                                config.themeConfig?.countdownLabelOpacity || 100
+                            )}
+                            onChange={(value) => {
+                                const { color, opacity } = parseColorAndOpacity(value as string);
+                                onChange({
+                                    ...config,
+                                    themeConfig: {
+                                        ...config.themeConfig,
+                                        countdownLabelColor: color,
+                                        countdownLabelOpacity: opacity,
+                                    },
+                                });
+                            }}
+                        />
+                        <InputColorOpacity
+                            label="Countdown Box Background"
+                            infoContent=""
+                            value={combineColorAndOpacity(
+                                config.themeConfig?.countdownBoxBackgroundColor || '#FFD700',
+                                config.themeConfig?.countdownBoxBackgroundOpacity || 100
+                            )}
+                            onChange={(value) => {
+                                const { color, opacity } = parseColorAndOpacity(value as string);
+                                onChange({
+                                    ...config,
+                                    themeConfig: {
+                                        ...config.themeConfig,
+                                        countdownBoxBackgroundColor: color,
+                                        countdownBoxBackgroundOpacity: opacity,
+                                    },
+                                });
+                            }}
+                        />
+                        <InputColorOpacity
+                            label="Countdown Box Text"
+                            infoContent=""
+                            value={combineColorAndOpacity(
+                                config.themeConfig?.countdownBoxTextColor || '#000000',
+                                config.themeConfig?.countdownBoxTextOpacity || 100
+                            )}
+                            onChange={(value) => {
+                                const { color, opacity } = parseColorAndOpacity(value as string);
+                                onChange({
+                                    ...config,
+                                    themeConfig: {
+                                        ...config.themeConfig,
+                                        countdownBoxTextColor: color,
+                                        countdownBoxTextOpacity: opacity,
+                                    },
+                                });
+                            }}
+                        />
+                    </Box>
                 </SidePanel.Section>
 
                 {/* Button Colors Section */}
                 <SidePanel.Section title={renderSectionTitle("Button Colors")}>
-                    <SidePanel.Field divider={false}>
-                        <FormField>
-                            <Box direction="vertical" gap="16px">
-                                <ColorControl
-                                    label="Button Background"
-                                    color={config.themeConfig?.buttonBackgroundColor || '#FFD700'}
-                                    opacity={config.themeConfig?.buttonBackgroundOpacity || 100}
-                                    onColorChange={(color) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                buttonBackgroundColor: color,
-                                            },
-                                        });
-                                    }}
-                                    onOpacityChange={(opacity) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                buttonBackgroundOpacity: opacity,
-                                            },
-                                        });
-                                    }}
-                                />
-                                <ColorControl
-                                    label="Button Text Color"
-                                    color={config.themeConfig?.buttonTextColor || '#000000'}
-                                    opacity={config.themeConfig?.buttonTextOpacity || 100}
-                                    onColorChange={(color) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                buttonTextColor: color,
-                                            },
-                                        });
-                                    }}
-                                    onOpacityChange={(opacity) => {
-                                        onChange({
-                                            ...config,
-                                            themeConfig: {
-                                                ...config.themeConfig,
-                                                buttonTextOpacity: opacity,
-                                            },
-                                        });
-                                    }}
-                                />
-                            </Box>
-                        </FormField>
-                    </SidePanel.Field>
+                    <Box direction="vertical" gap="16px">
+                        <InputColorOpacity
+                            label="Button Background"
+                            infoContent=""
+                            value={combineColorAndOpacity(
+                                config.themeConfig?.buttonBackgroundColor || '#FFD700',
+                                config.themeConfig?.buttonBackgroundOpacity || 100
+                            )}
+                            onChange={(value) => {
+                                const { color, opacity } = parseColorAndOpacity(value as string);
+                                onChange({
+                                    ...config,
+                                    themeConfig: {
+                                        ...config.themeConfig,
+                                        buttonBackgroundColor: color,
+                                        buttonBackgroundOpacity: opacity,
+                                    },
+                                });
+                            }}
+                        />
+                        <InputColorOpacity
+                            label="Button Text Color"
+                            infoContent=""
+                            value={combineColorAndOpacity(
+                                config.themeConfig?.buttonTextColor || '#000000',
+                                config.themeConfig?.buttonTextOpacity || 100
+                            )}
+                            onChange={(value) => {
+                                const { color, opacity } = parseColorAndOpacity(value as string);
+                                onChange({
+                                    ...config,
+                                    themeConfig: {
+                                        ...config.themeConfig,
+                                        buttonTextColor: color,
+                                        buttonTextOpacity: opacity,
+                                    },
+                                });
+                            }}
+                        />
+                    </Box>
                 </SidePanel.Section>
             </SidePanel.Content>
         </SidePanel>
