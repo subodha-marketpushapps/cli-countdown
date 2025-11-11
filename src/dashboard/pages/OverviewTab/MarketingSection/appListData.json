@@ -1,0 +1,64 @@
+{
+  "apps": [
+    {
+      "id": "auction-store",
+      "title": "Auction Store",
+      "description": "Bidding Marketplace For Your Products",
+      "pricing": "Free plan available",
+      "image": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_banner-auction-store.png",
+      "icon": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_logo-auction-store.png",
+      "url": "https://www.wix.com/app-market/auction-store",
+      "category": "eCommerce"
+    },
+    {
+      "id": "blog-recipes",
+      "title": "Blog Recipes",
+      "description": "Turn Ideas to Feasts: Craft & Blog Recipes Today",
+      "pricing": "Free to install",
+      "image": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_banner-blog-recipes.png",
+      "icon": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_logo-blog-recipes.png",
+      "url": "https://www.wix.com/app-market/blog-recipes",
+      "category": "Content & Media"
+    },
+    {
+      "id": "bookings-products-cross-sell",
+      "title": "Bookings Products Cross-Sell",
+      "description": "Cross-sell Products directly on Service Pages",
+      "pricing": "Free plan available",
+      "image": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_banner-bookings-products-cross-sell.png",
+      "icon": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_logo-bookings-products-cross-sell.png",
+      "url": "https://www.wix.com/app-market/bookings-products-cross-sell",
+      "category": "Business Management"
+    },
+    {
+      "id": "quantity-volume-discounts",
+      "title": "Quantity & Volume Discounts",
+      "description": "Boost Sales with Quantity-Based Discounts",
+      "pricing": "Free plan available",
+      "image": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_banner-quantity-volume-discounts.png",
+      "icon": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_logo-quantity-volume-discounts.png",
+      "url": "https://www.wix.com/app-market/quantity-volume-discounts",
+      "category": "eCommerce"
+    },
+    {
+      "id": "bundle-upsell",
+      "title": "Frequently Bought Together",
+      "description": "Turn Popular Product Pairs into More Sales",
+      "pricing": "Free plan available",
+      "image": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_banner-fbt.png",
+      "icon": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_logo-fbt.png",
+      "url": "https://www.wix.com/app-market/bundle-upsell",
+      "category": "eCommerce"
+    },
+    {
+      "id": "google-reviews-widget",
+      "title": "Google Reviews PRO",
+      "description": "Easily display Google Reviews on your site",
+      "pricing": "Free plan available",
+      "image": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_banner-google-reviews-widget.png",
+      "icon": "https://mkp-prod.nyc3.cdn.digitaloceanspaces.com/whatsapp-chat/promo-apps/image_logo-google-reviews-widget.svg",
+      "url": "https://www.wix.com/app-market/google-reviews-widget",
+      "category": "Marketing & SEO"
+    }
+  ]
+}

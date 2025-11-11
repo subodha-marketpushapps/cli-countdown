@@ -13,8 +13,8 @@ import {
 import * as Icons from "@wix/wix-ui-icons-common";
 import { DEFAULT_PANEL_WIDTH } from "../SidePanelContainer";
 import { renderSectionTitle } from "../utils/renderSectionTitle";
-import { TimerConfig } from "../../types";
-import { InputColorOpacity } from "../../../components/FormInputs";
+import { TimerConfig } from "../../../types";
+import { InputColorOpacity } from "../../../../components/FormInputs";
 
 interface CustomizeThemeProps {
     config: TimerConfig;

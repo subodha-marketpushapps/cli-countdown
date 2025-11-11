@@ -1,0 +1,21 @@
+.card-group {
+  border: 1px solid
+    var(--wds-color-border-dark-secondary, var(--wsr-color-D70, #eceff3));
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+
+  .hr-low-light {
+    background-color: var(--wsr-color-D70, #eceff3);
+  }
+}
+
+.big-font {
+  font-size: 36px !important;
+  line-height: normal !important;
+}
+
+.highted-context {
+  min-width: 120px;
+  padding: 6px 16px 4px 8px;
+}

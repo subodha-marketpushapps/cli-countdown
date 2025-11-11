@@ -13,8 +13,8 @@ import {
 } from '@wix/design-system';
 import '@wix/design-system/styles.global.css';
 import * as Icons from '@wix/wix-ui-icons-common';
-import SidePanelContainer from './SidePanels/SidePanelContainer';
-import { PanelTimer, PanelContent, PanelPosition, PanelAppearance } from './SidePanels';
+import SidePanelContainer from './WidgetBuilder/SidePanels/SidePanelContainer';
+import { PanelTimer, PanelContent, PanelPosition, PanelAppearance } from './WidgetBuilder/SidePanels';
 import WidgetEditorHeader from './WidgetEditorHeader';
 import PreviewArea from './PreviewArea';
 import CountDownTimer from './components/CountDownTimer';

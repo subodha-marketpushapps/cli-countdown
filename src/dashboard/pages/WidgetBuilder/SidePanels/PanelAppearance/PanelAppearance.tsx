@@ -1,32 +1,32 @@
 import React, { useState } from "react";
 import { Layout, FormField, SidePanel, Input, Box, Text, ToggleSwitch, Image } from "@wix/design-system";
 import { Edit as EditIcon } from "@wix/wix-ui-icons-common";
-import { TimerConfig } from "../../types";
+import { TimerConfig } from "../../../types";
 import { renderSectionTitle } from "../utils/renderSectionTitle";
 import { DEFAULT_PANEL_WIDTH } from "../SidePanelContainer";
-import CountDownTemplate, { CountdownBannerProps, TemplateLayout } from "../../../components/WidgetCountDown/CountDownTemplate";
-import Carousel, { CarouselItem } from "../../../components/common/Carousel";
+import CountDownTemplate, { CountdownBannerProps, TemplateLayout } from "../../../../components/WidgetCountDown/CountDownTemplate";
+import Carousel, { CarouselItem } from "../../../../components/common/Carousel";
 import CustomizeTheme from "./CostomizeTheme";
 
 // Import template background images
-import blackFridayImage from "../../../../assets/images/template-background/black _friday.png";
-import christmasImage from "../../../../assets/images/template-background/christmas.png";
-import cyberMonday2Image from "../../../../assets/images/template-background/cyber_monday_2.png";
-import cyberMondayImage from "../../../../assets/images/template-background/cyber_monday.png";
-import easterImage from "../../../../assets/images/template-background/easter.png";
-import flashOfferImage from "../../../../assets/images/template-background/flash_offer.png";
-import goldenHourDealsImage from "../../../../assets/images/template-background/golden_hour_deals.png";
-import halloweenImage from "../../../../assets/images/template-background/halloween.png";
-import limitedTimeOfferImage from "../../../../assets/images/template-background/limited_time_offer.png";
-import newYearCountdownImage from "../../../../assets/images/template-background/new_year_countdown.png";
-import summerSplashImage from "../../../../assets/images/template-background/summer_splash.png";
+import blackFridayImage from "../../../../../assets/images/template-background/black _friday.png";
+import christmasImage from "../../../../../assets/images/template-background/christmas.png";
+import cyberMonday2Image from "../../../../../assets/images/template-background/cyber_monday_2.png";
+import cyberMondayImage from "../../../../../assets/images/template-background/cyber_monday.png";
+import easterImage from "../../../../../assets/images/template-background/easter.png";
+import flashOfferImage from "../../../../../assets/images/template-background/flash_offer.png";
+import goldenHourDealsImage from "../../../../../assets/images/template-background/golden_hour_deals.png";
+import halloweenImage from "../../../../../assets/images/template-background/halloween.png";
+import limitedTimeOfferImage from "../../../../../assets/images/template-background/limited_time_offer.png";
+import newYearCountdownImage from "../../../../../assets/images/template-background/new_year_countdown.png";
+import summerSplashImage from "../../../../../assets/images/template-background/summer_splash.png";
 
 // Import clock style images
-import timer1Image from "../../../../assets/images/clock-styles/Timer_1.svg";
-import timer2Image from "../../../../assets/images/clock-styles/Timer_2.svg";
-import timer3Image from "../../../../assets/images/clock-styles/Timer_3.svg";
-import timer4Image from "../../../../assets/images/clock-styles/Timer_4.svg";
-import timer5Image from "../../../../assets/images/clock-styles/Timer_5.svg";
+import timer1Image from "../../../../../assets/images/clock-styles/Timer_1.svg";
+import timer2Image from "../../../../../assets/images/clock-styles/Timer_2.svg";
+import timer3Image from "../../../../../assets/images/clock-styles/Timer_3.svg";
+import timer4Image from "../../../../../assets/images/clock-styles/Timer_4.svg";
+import timer5Image from "../../../../../assets/images/clock-styles/Timer_5.svg";
 
 interface Props {
     config: TimerConfig;

@@ -1,0 +1,19 @@
+.card {
+  display: flex;
+  min-width: 120px;
+  max-width: 296px;
+  padding: 8px 12px 10px 12px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: stretch;
+}
+
+.medium-plus {
+  font-size: 18px !important;
+  line-height: normal !important;
+}
+.large-font {
+  font-size: 36px !important;
+  line-height: normal !important;
+}
