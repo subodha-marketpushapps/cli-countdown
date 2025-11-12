@@ -12,7 +12,7 @@ import {
 import '@wix/design-system/styles.global.css';
 import * as Icons from '@wix/wix-ui-icons-common';
 import SidePanelContainer from './SidePanels/SidePanelContainer';
-import { PanelTimer, PanelContent, PanelPosition, PanelAppearance } from './SidePanels';
+import { PanelTimer, PanelContent, PanelPosition, PanelBehavior, PanelAppearance } from './SidePanels';
 import WidgetEditorHeader from './WidgetEditorHeader';
 import WidgetBuilderBackground from './WidgetBuilderBackground';
 import PreviewArea from '../PreviewArea';
@@ -41,7 +41,8 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
     { id: 0, label: "Timer", icon: <Icons.Timer /> },
     { id: 1, label: "Content", icon: <Icons.SiteContent /> },
     { id: 2, label: "Appearance", icon: <Icons.Template /> },
-    { id: 3, label: "Position", icon: <Icons.Pin /> },
+    { id: 3, label: "Behavior", icon: <Icons.Rule /> },
+    { id: 4, label: "Position", icon: <Icons.Pin /> },
   ];
 
   const handleConfigChange = useCallback((newConfig: TimerConfig) => {
@@ -405,6 +406,13 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
                     />
                   )}
                   {selectedSidebar === 3 && (
+                    <PanelBehavior
+                      config={config}
+                      onChange={handleConfigChange}
+                      onCloseButtonClick={() => setSelectedSidebar(-1)}
+                    />
+                  )}
+                  {selectedSidebar === 4 && (
                     <PanelPosition
                       config={config}
                       onChange={handleConfigChange}

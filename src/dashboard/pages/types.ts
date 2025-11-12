@@ -6,6 +6,14 @@ export interface TimerConfig {
     endDate?: Date;
     endTime?: Date;
     timeZone?: string;
+    // Personal countdown mode
+    remainingTimePeriod?: number;
+    remainingTimePeriodUnit?: 'minutes' | 'hours' | 'days';
+    // Number counter mode
+    countFrom?: number;
+    countPeriodStart?: number; // Alias for countFrom
+    countTo?: number;
+    countFrequency?: number; // Frequency in seconds
     displayOptions?: {
       showDays?: boolean;
       showHours?: boolean;
@@ -63,5 +71,18 @@ export interface TimerConfig {
     buttonTextColor?: string;
     buttonTextOpacity?: number;
   };
+  behaviorConfig?: {
+    behaviorBannerAnimation?: BehaviorBannerAnimation;
+    behaviorCounterNumberAnimation?: BehaviorCounterNumberAnimation;
+    frequency?: 'perSession' | 'everyXMinutes';
+    minutesInterval?: number;
+    targeting?: 'allPages' | 'specificPages';
+    specificPages?: string[];
+    allowManualClose?: boolean;
+  };
 }
+
+export type BehaviorBannerAnimation = 'slideIn' | 'fadeIn' | 'popIn' | 'bounce';
+export type BehaviorCounterNumberAnimation = 'smoothIncrement' | 'popTransition' | 'flipClock' | 'fadeBetweenDigits';
+
 

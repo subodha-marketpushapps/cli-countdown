@@ -156,6 +156,9 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
           left: 0,
           right: 0,
           width: '100%',
+          maxWidth: '100%',
+          transform: 'none',
+          borderRadius: '0',
           zIndex: backgroundMode === 'website' ? 10005 : undefined,
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         };
@@ -167,6 +170,9 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
           left: 0,
           right: 0,
           width: '100%',
+          maxWidth: '100%',
+          transform: 'none',
+          borderRadius: '0',
           zIndex: backgroundMode === 'website' ? 10005 : 9999,
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         };
@@ -175,9 +181,13 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
           ...bannerStyle,
           position: 'absolute',
           bottom: 0,
+          top: 'auto',
           left: 0,
           right: 0,
           width: '100%',
+          maxWidth: '100%',
+          transform: 'none',
+          borderRadius: '0',
           zIndex: backgroundMode === 'website' ? 10005 : 9999,
           boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
         };
@@ -316,7 +326,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
       borderRadius="0px"    
       // margin="16px"
     >
-      {/* {renderOverlayBackdrop()} */}
+      {renderOverlayBackdrop()}
       <Box
         style={getPreviewWrapperStyles()}
       >
@@ -332,7 +342,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
           }}
         >
         {/* Countdown Timer Preview */}
-        <div style={getPlacementStyles()}>
+        <div key={config.placement} style={getPlacementStyles()}>
           {/* Close button for centered overlay - positioned relative to the countdown timer */}
           {config.placement === 'centered_overlay' && !isOverlayClosed && (
             <IconButton
@@ -381,10 +391,17 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
               clockConfig={{
                 labelPosition: selectedClockConfig.labelPosition,
                 numberStyle: selectedClockConfig.numberStyle,
-                endDate: endDate || new Date(),
-                endTime: getEndTimeString(),
+                endDate: config.timerMode === 'start-to-finish-timer' ? (endDate || new Date()) : undefined,
+                endTime: config.timerMode === 'start-to-finish-timer' ? getEndTimeString() : undefined,
                 backgroundColor: selectedClockConfig.backgroundColor,
                 textColor: selectedClockConfig.textColor,
+                timerMode: config.timerMode,
+                remainingTimePeriod: config.timerConfig?.remainingTimePeriod,
+                remainingTimePeriodUnit: config.timerConfig?.remainingTimePeriodUnit,
+                countFrom: config.timerConfig?.countPeriodStart ?? config.timerConfig?.countFrom,
+                countTo: config.timerConfig?.countTo,
+                countFrequency: config.timerConfig?.countFrequency,
+                displayOptions: config.timerConfig?.displayOptions,
               }}
               layout={selectedLayout}
               title={config.title || "Flash Sale"}

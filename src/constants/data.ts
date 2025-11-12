@@ -27,6 +27,14 @@ export const createDefaultTimerConfig = (): TimerConfig => {
       endDate,
       endTime,
       timeZone: 'UTC',
+      // Personal countdown defaults
+      remainingTimePeriod: 10,
+      remainingTimePeriodUnit: 'minutes',
+      // Number counter defaults
+      countFrom: 0,
+      countPeriodStart: 0,
+      countTo: 100,
+      countFrequency: 1,
       displayOptions: {
         showDays: true,
         showHours: true,
@@ -44,6 +52,15 @@ export const createDefaultTimerConfig = (): TimerConfig => {
     numberStyle: 'fillEachDigit',
     backgroundColor: '#2563eb',
     textColor: '#ffffff',
+    behaviorConfig: {
+      behaviorBannerAnimation: 'slideIn',
+      behaviorCounterNumberAnimation: 'smoothIncrement',
+      frequency: 'perSession',
+      minutesInterval: 2,
+      targeting: 'allPages',
+      specificPages: [],
+      allowManualClose: true,
+    },
   };
 };
 

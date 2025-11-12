@@ -172,14 +172,7 @@ const PanelAppearance: React.FC<Props> = ({
             content: (
                 <div style={{backgroundColor: "#C4DCFFFF"}}>
                     <CountDownTemplate
-                        clockConfig={{
-                            labelPosition: selectedClockConfig.labelPosition,
-                            numberStyle: selectedClockConfig.numberStyle,
-                            endDate: endDate,
-                            endTime: endTime,
-                            backgroundColor: selectedClockConfig.backgroundColor,
-                            textColor: selectedClockConfig.textColor,
-                        }}
+                        clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-1']}
                         title={config.title || "Flash Sale"}
                         subTitle={config.subtitle || "Limited Stock"}
@@ -207,14 +200,7 @@ const PanelAppearance: React.FC<Props> = ({
             content: (
                 <div style={{backgroundColor: "#C4DCFFFF"}}>
                     <CountDownTemplate
-                        clockConfig={{
-                            labelPosition: selectedClockConfig.labelPosition,
-                            numberStyle: selectedClockConfig.numberStyle,
-                            endDate: endDate,
-                            endTime: endTime,
-                            backgroundColor: selectedClockConfig.backgroundColor,
-                            textColor: selectedClockConfig.textColor,
-                        }}
+                        clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-2']}
                         title={config.title || "Flash Sale"}
                         subTitle={config.subtitle || "Limited Stock"}
@@ -242,14 +228,7 @@ const PanelAppearance: React.FC<Props> = ({
             content: (
                 <div style={{backgroundColor: "#C4DCFFFF"}}>
                     <CountDownTemplate
-                        clockConfig={{
-                            labelPosition: selectedClockConfig.labelPosition,
-                            numberStyle: selectedClockConfig.numberStyle,
-                            endDate: endDate,
-                            endTime: endTime,
-                            backgroundColor: selectedClockConfig.backgroundColor,
-                            textColor: selectedClockConfig.textColor,
-                        }}
+                        clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-3']}
                         title={config.title || "Flash Sale"}
                         subTitle={config.subtitle || "Limited Stock"}
@@ -277,14 +256,7 @@ const PanelAppearance: React.FC<Props> = ({
             content: (
                 <div style={{backgroundColor: "#C4DCFFFF"}}>
                     <CountDownTemplate
-                        clockConfig={{
-                            labelPosition: selectedClockConfig.labelPosition,
-                            numberStyle: selectedClockConfig.numberStyle,
-                            endDate: endDate,
-                            endTime: endTime,
-                            backgroundColor: selectedClockConfig.backgroundColor,
-                            textColor: selectedClockConfig.textColor,
-                        }}
+                        clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-4']}
                         title={config.title || "Flash Sale"}
                         subTitle={config.subtitle || "Limited Stock"}
@@ -312,14 +284,7 @@ const PanelAppearance: React.FC<Props> = ({
             content: (
                 <div style={{backgroundColor: "#C4DCFFFF"}}>
                     <CountDownTemplate
-                        clockConfig={{
-                            labelPosition: selectedClockConfig.labelPosition,
-                            numberStyle: selectedClockConfig.numberStyle,
-                            endDate: endDate,
-                            endTime: endTime,
-                            backgroundColor: selectedClockConfig.backgroundColor,
-                            textColor: selectedClockConfig.textColor,
-                        }}
+                        clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-5']}
                         title={config.title || "Flash Sale"}
                         subTitle={config.subtitle || "Limited Stock"}
@@ -347,14 +312,7 @@ const PanelAppearance: React.FC<Props> = ({
             content: (
                 <div style={{backgroundColor: "#C4DCFFFF"}}>
                     <CountDownTemplate
-                        clockConfig={{
-                            labelPosition: selectedClockConfig.labelPosition,
-                            numberStyle: selectedClockConfig.numberStyle,
-                            endDate: endDate,
-                            endTime: endTime,
-                            backgroundColor: selectedClockConfig.backgroundColor,
-                            textColor: selectedClockConfig.textColor,
-                        }}
+                        clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-6']}
                         title={config.title || "Flash Sale"}
                         subTitle={config.subtitle || "Limited Stock"}
@@ -382,14 +340,7 @@ const PanelAppearance: React.FC<Props> = ({
             content: (
                 <div style={{backgroundColor: "#C4DCFFFF"}}>
                     <CountDownTemplate
-                        clockConfig={{
-                            labelPosition: selectedClockConfig.labelPosition,
-                            numberStyle: selectedClockConfig.numberStyle,
-                            endDate: endDate,
-                            endTime: endTime,
-                            backgroundColor: selectedClockConfig.backgroundColor,
-                            textColor: selectedClockConfig.textColor,
-                        }}
+                        clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-7']}
                         title={config.title || "Flash Sale"}
                         subTitle={config.subtitle || "Limited Stock"}
@@ -417,14 +368,7 @@ const PanelAppearance: React.FC<Props> = ({
             content: (
                 <div style={{backgroundColor: "#C4DCFFFF"}}>
                     <CountDownTemplate
-                        clockConfig={{
-                            labelPosition: selectedClockConfig.labelPosition,
-                            numberStyle: selectedClockConfig.numberStyle,
-                            endDate: endDate,
-                            endTime: endTime,
-                            backgroundColor: selectedClockConfig.backgroundColor,
-                            textColor: selectedClockConfig.textColor,
-                        }}
+                        clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-8']}
                         title={config.title || "Flash Sale"}
                         subTitle={config.subtitle || "Limited Stock"}
@@ -640,10 +584,7 @@ const PanelAppearance: React.FC<Props> = ({
                     <Box width="100%" style={{ maxWidth: "100%", overflow: "hidden", position: 'relative', zIndex: 1 }}>
                         <CountDownTemplate
                             clockConfig={{
-                                labelPosition: selectedClockConfig.labelPosition,
-                                numberStyle: selectedClockConfig.numberStyle,
-                                endDate: endDate,
-                                endTime: endTime,
+                                ...getClockConfig(),
                                 backgroundColor: themeConfigForPreview?.countdownBoxBackgroundColor || selectedClockConfig.backgroundColor,
                                 textColor: themeConfigForPreview?.countdownBoxTextColor || selectedClockConfig.textColor,
                             }}
