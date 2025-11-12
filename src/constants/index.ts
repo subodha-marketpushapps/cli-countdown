@@ -45,7 +45,7 @@ export const HELP_CENTER_URL =
 export const INTERCOM_APP_ID = "h6dkwybg";
 
 // The LOGROCKET_APP_ID constant contains the LogRocket app ID
-export const LOGROCKET_APP_ID = "mea0ra/whatsapp-chat-marketing-tv0cc";
+// export const LOGROCKET_APP_ID = "mea0ra/countdown-timer-tv0cc";
 
 // The GUIDE_JAR_IFRAMES object contains the MAIN_FLOW_URL and PUBLISH_SITE_FLOW_URL properties
 export const GUIDE_JAR_IFRAMES = {
@@ -58,7 +58,7 @@ export const GUIDE_JAR_IFRAMES = {
 };
 
 // Loading Screen Constants
-// export { FEATURE_SLIDES, SLIDER_CONFIG } from "./loading-screen";
+export { FEATURE_SLIDES, SLIDER_CONFIG } from "./loading-screen";
 
 export * from "./data";
 
