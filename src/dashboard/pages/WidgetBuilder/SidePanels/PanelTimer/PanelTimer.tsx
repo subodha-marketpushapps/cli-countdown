@@ -290,6 +290,21 @@ const PanelTimer: React.FC<Props> = ({
                 <Layout cols={1} gap="12px">
 
                   <Checkbox
+                    checked={config.timerConfig?.displayOptions?.showDays ?? true}
+                    onChange={(e) => onChange({
+                      ...config,
+                      timerConfig: {
+                        ...config.timerConfig,
+                        displayOptions: {
+                          ...config.timerConfig?.displayOptions,
+                          showDays: e.target.checked
+                        }
+                      }
+                    })}
+                  >
+                    Days
+                  </Checkbox>
+                  <Checkbox
                     checked={config.timerConfig?.displayOptions?.showHours ?? true}
                     onChange={(e) => onChange({
                       ...config,

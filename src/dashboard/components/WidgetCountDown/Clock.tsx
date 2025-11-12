@@ -84,16 +84,12 @@ const Clock: React.FC<ClockProps> = ({
         return;
       }
 
-      const showDays = displayOptions?.showDays !== false;
-      const showHours = displayOptions?.showHours !== false;
-      const showMinutes = displayOptions?.showMinutes !== false;
-      const showSeconds = displayOptions?.showSeconds !== false;
-
+      // Always calculate the full time difference, regardless of display options
       setTimeRemaining({
-        days: showDays ? Math.floor(difference / (1000 * 60 * 60 * 24)) : 0,
-        hours: showHours ? Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) : 0,
-        minutes: showMinutes ? Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)) : 0,
-        seconds: showSeconds ? Math.floor((difference % (1000 * 60)) / 1000) : 0,
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((difference % (1000 * 60)) / 1000),
       });
     };
 
@@ -101,25 +97,20 @@ const Clock: React.FC<ClockProps> = ({
     const interval = setInterval(calculateTimeRemaining, 1000);
 
     return () => clearInterval(interval);
-  }, [endDate, endTime, timerMode, displayOptions]);
+  }, [endDate, endTime, timerMode]);
 
   // Personal countdown mode
   useEffect(() => {
-    if (timerMode !== 'personal-countdown' || !remainingTimePeriod) return;
+    if (timerMode !== 'personal-countdown' || !remainingTimePeriod) {
+      return;
+    }
+
+    // Reset start time when period or unit changes - each time this effect runs, start a new countdown
+    const startTime = new Date().getTime();
 
     const calculatePersonalCountdown = () => {
-      // For personal countdown, we'll use localStorage to track per-visitor time
-      const storageKey = 'countdown-timer-personal-start';
-      let startTime = localStorage.getItem(storageKey);
-      
-      if (!startTime) {
-        startTime = new Date().getTime().toString();
-        localStorage.setItem(storageKey, startTime);
-      }
-
-      const start = parseInt(startTime, 10);
       const now = new Date().getTime();
-      const elapsed = now - start;
+      const elapsed = now - startTime;
 
       // Convert remaining time period to milliseconds
       let periodMs = 0;
@@ -142,24 +133,23 @@ const Clock: React.FC<ClockProps> = ({
         return;
       }
 
-      const showDays = displayOptions?.showDays !== false;
-      const showHours = displayOptions?.showHours !== false;
-      const showMinutes = displayOptions?.showMinutes !== false;
-      const showSeconds = displayOptions?.showSeconds !== false;
-
+      // Always calculate the full time difference, regardless of display options
       setTimeRemaining({
-        days: showDays ? Math.floor(remaining / (1000 * 60 * 60 * 24)) : 0,
-        hours: showHours ? Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) : 0,
-        minutes: showMinutes ? Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60)) : 0,
-        seconds: showSeconds ? Math.floor((remaining % (1000 * 60)) / 1000) : 0,
+        days: Math.floor(remaining / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((remaining % (1000 * 60)) / 1000),
       });
     };
 
+    // Calculate immediately
     calculatePersonalCountdown();
+    
+    // Then update every second
     const interval = setInterval(calculatePersonalCountdown, 1000);
 
     return () => clearInterval(interval);
-  }, [timerMode, remainingTimePeriod, remainingTimePeriodUnit, displayOptions]);
+  }, [timerMode, remainingTimePeriod, remainingTimePeriodUnit]);
 
   // Number counter mode
   useEffect(() => {
@@ -291,6 +281,39 @@ const Clock: React.FC<ClockProps> = ({
   const showMinutes = displayOptions?.showMinutes !== false;
   const showSeconds = displayOptions?.showSeconds !== false;
 
+  // Calculate display values with conversions when higher units are hidden
+  let displayDays = timeRemaining.days;
+  let displayHours = timeRemaining.hours;
+  let displayMinutes = timeRemaining.minutes;
+  let displaySeconds = timeRemaining.seconds;
+
+  // If Days is not selected, add days to hours (days * 24)
+  if (!showDays && showHours) {
+    displayHours = timeRemaining.hours + (timeRemaining.days * 24);
+  }
+
+  // If Hours is not selected, add hours to minutes (hours * 60)
+  if (!showHours && showMinutes) {
+    displayMinutes = timeRemaining.minutes + (timeRemaining.hours * 60);
+    // Also add days to minutes if days are not shown
+    if (!showDays) {
+      displayMinutes = timeRemaining.minutes + (timeRemaining.hours * 60) + (timeRemaining.days * 24 * 60);
+    }
+  }
+
+  // If Minutes is not selected, add minutes to seconds (minutes * 60)
+  if (!showMinutes && showSeconds) {
+    displaySeconds = timeRemaining.seconds + (timeRemaining.minutes * 60);
+    // Also add hours to seconds if hours are not shown
+    if (!showHours) {
+      displaySeconds = timeRemaining.seconds + (timeRemaining.minutes * 60) + (timeRemaining.hours * 60 * 60);
+      // Also add days to seconds if days are not shown
+      if (!showDays) {
+        displaySeconds = timeRemaining.seconds + (timeRemaining.minutes * 60) + (timeRemaining.hours * 60 * 60) + (timeRemaining.days * 24 * 60 * 60);
+      }
+    }
+  }
+
   return (
     <Box
       direction="horizontal"
@@ -301,10 +324,10 @@ const Clock: React.FC<ClockProps> = ({
         justifyContent: 'center',
       }}
     >
-      {showDays && renderDigit(formatNumber(timeRemaining.days), 'Days')}
-      {showHours && renderDigit(formatNumber(timeRemaining.hours), 'Hours')}
-      {showMinutes && renderDigit(formatNumber(timeRemaining.minutes), 'Minutes')}
-      {showSeconds && renderDigit(formatNumber(timeRemaining.seconds), 'Seconds')}
+      {showDays && renderDigit(formatNumber(displayDays), 'Days')}
+      {showHours && renderDigit(formatNumber(displayHours), 'Hours')}
+      {showMinutes && renderDigit(formatNumber(displayMinutes), 'Minutes')}
+      {showSeconds && renderDigit(formatNumber(displaySeconds), 'Seconds')}
     </Box>
   );
 };
