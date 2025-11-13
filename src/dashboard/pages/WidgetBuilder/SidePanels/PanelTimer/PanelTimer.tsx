@@ -180,6 +180,28 @@ const PanelTimer: React.FC<Props> = ({
                 </Box>
               </FormField>
             </SidePanel.Field>
+            <SidePanel.Field divider={false}>
+              <FormField>
+                <Box direction="vertical" gap="8px">
+                  <Text secondary size="small">Count Direction</Text>
+                  <Dropdown
+                    size="small"
+                    selectedId={config.timerConfig?.countDirection || "descending"}
+                    onSelect={(option) => onChange({
+                      ...config,
+                      timerConfig: { 
+                        ...config.timerConfig, 
+                        countDirection: option?.id as 'ascending' | 'descending' || 'descending'
+                      }
+                    })}
+                    options={[
+                      { id: 'descending', value: 'Descending (Count Down)' },
+                      { id: 'ascending', value: 'Ascending (Count Up)' },
+                    ]}
+                  />
+                </Box>
+              </FormField>
+            </SidePanel.Field>
           </SidePanel.Section>
         )}
 
@@ -210,6 +232,28 @@ const PanelTimer: React.FC<Props> = ({
                       ...config,
                       timerConfig: { ...config.timerConfig, remainingTimePeriodUnit: option?.id as 'minutes' | 'hours' | 'days' }
                     })}
+                  />
+                </Box>
+              </FormField>
+            </SidePanel.Field>
+            <SidePanel.Field divider={false}>
+              <FormField>
+                <Box direction="vertical" gap="8px">
+                  <Text secondary size="small">Count Direction</Text>
+                  <Dropdown
+                    size="small"
+                    selectedId={config.timerConfig?.countDirection || "descending"}
+                    onSelect={(option) => onChange({
+                      ...config,
+                      timerConfig: { 
+                        ...config.timerConfig, 
+                        countDirection: option?.id as 'ascending' | 'descending' || 'descending'
+                      }
+                    })}
+                    options={[
+                      { id: 'descending', value: 'Descending (Count Down)' },
+                      { id: 'ascending', value: 'Ascending (Count Up)' },
+                    ]}
                   />
                 </Box>
               </FormField>

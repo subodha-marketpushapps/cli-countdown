@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Card, Text, InfoIcon, Button, IconButton } from '@wix/design-system';
+import { IconButton } from '@wix/design-system';
 import * as Icons from '@wix/wix-ui-icons-common';
 import { TimerConfig } from './types';
 import CountDownTemplate, { TemplateLayout } from '../components/WidgetCountDown/CountDownTemplate';
@@ -12,14 +12,36 @@ interface PreviewAreaProps {
   backgroundMode?: 'clean' | 'website';
 }
 
-const PreviewArea: React.FC<PreviewAreaProps> = ({ 
-  config, 
-  endDate, 
-  endTime, 
+const PreviewArea: React.FC<PreviewAreaProps> = ({
+  config,
+  endDate,
+  endTime,
   viewType = 'desktopView',
   backgroundMode = 'website'
 }) => {
   const [isOverlayClosed, setIsOverlayClosed] = useState(false);
+
+  // Helper function to get startDate from config with fallback
+  const getStartDate = (): Date => {
+    if (config.timerConfig?.startDate) {
+      return new Date(config.timerConfig.startDate);
+    }
+    // Default fallback: today
+    return new Date();
+  };
+
+  // Helper function to format startTime Date to "HH:mm:ss" string
+  const getStartTimeString = (): string => {
+    if (config.timerConfig?.startTime) {
+      const time = new Date(config.timerConfig.startTime);
+      const hours = String(time.getHours()).padStart(2, '0');
+      const minutes = String(time.getMinutes()).padStart(2, '0');
+      const seconds = String(time.getSeconds()).padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    }
+    // Default fallback: start of day
+    return "00:00:00";
+  };
 
   // Helper function to convert Date to time string
   const getEndTimeString = (): string => {
@@ -115,11 +137,11 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
   const getPlacementStyles = (): React.CSSProperties => {
     const bannerStyle: React.CSSProperties = {
       width: '100%',
-      backgroundColor: themeConfig.backgroundImageUrl 
-        ? 'transparent' 
+      backgroundColor: themeConfig.backgroundImageUrl
+        ? 'transparent'
         : (themeConfig.backgroundColor || '#FFFFFF'),
-      backgroundImage: themeConfig.backgroundImageUrl 
-        ? `url(${themeConfig.backgroundImageUrl})` 
+      backgroundImage: themeConfig.backgroundImageUrl
+        ? `url(${themeConfig.backgroundImageUrl})`
         : undefined,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
@@ -209,13 +231,13 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
   const renderOverlayBackdrop = () => {
     if (config.placement === 'centered_overlay' && !isOverlayClosed) {
       return (
-        <Box
-          position="absolute"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
+        <div
           style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
             zIndex: 10000,
           }}
@@ -238,12 +260,14 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
       height: '100%',
       overflow: 'hidden',
       transform: 'none',
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
     };
 
     if (viewType === 'mobileView') {
       return {
         ...baseStyle,
-        display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: backgroundMode === 'clean' ? '#F5F5F5' : 'transparent',
@@ -276,29 +300,29 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
       width: '100%',
       height: '100%',
       position: 'relative',
-      flex: '1',
+      flex: 1,
+      minWidth: 0,
     };
   };
 
   // Don't render banner if overlay is closed
   if (config.placement === 'centered_overlay' && isOverlayClosed) {
     return (
-      <Box
-        flex="1"
-        height="100%"
-        width="100%"
-        position="relative"
-        style={getContainerStyles()}
-        borderRadius="0px"
+      <div
+        style={{
+          ...getContainerStyles(),
+          width: '100%',
+          height: '100%',
+        }}
       >
-        <Box
+        <div
           style={getPreviewWrapperStyles()}
         >
-          <Box
-            width="100%"
-            height="100%"
-            position="relative"
+          <div
             style={{
+              width: '100%',
+              height: '100%',
+              position: 'relative',
               padding: '20px',
               minHeight: '100%',
               display: 'flex',
@@ -306,128 +330,130 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
               justifyContent: 'center',
             }}
           >
-            <Text secondary>Overlay closed. Change placement to show preview.</Text>
-          </Box>
-        </Box>
-      </Box>
+            <span style={{ color: '#6B7280', fontSize: '14px' }}>Overlay closed. Change placement to show preview.</span>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Box
-      flex="1"
-      height="100%"
-      width="100%"
-      position="relative"
+    <div
       style={{
         ...getContainerStyles(),
+        width: '100%',
         minWidth: 0,
+        flex: 1,
       }}
-      borderRadius="0px"    
-      // margin="16px"
     >
       {renderOverlayBackdrop()}
-      <Box
-        style={getPreviewWrapperStyles()}
+      <div
+        style={{
+          ...getPreviewWrapperStyles(),
+          width: '100%',
+        }}
       >
-        <Box
-          width="100%"
-          height="100%"
-          position="relative"
-          margin={backgroundMode === 'website' ? '0' : (config.placement === 'centered_overlay' ? '0' : '20px')}
+        <div
           style={{
+            width: '100%',
+            height: '100%',
+            position: 'relative',
             padding: backgroundMode === 'website' ? '0' : (config.placement === 'centered_overlay' ? '0' : '20px'),
             minHeight: '100%',
             overflow: config.placement === 'static_top' || config.placement === 'centered_overlay' ? 'visible' : 'hidden',
+            boxSizing: 'border-box',
           }}
         >
-        {/* Countdown Timer Preview */}
-        <div key={config.placement} style={getPlacementStyles()}>
-          {/* Close button for centered overlay - positioned relative to the countdown timer */}
-          {config.placement === 'centered_overlay' && !isOverlayClosed && (
-            <IconButton
-              skin="dark"
-              priority="tertiary"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOverlayClosed(true);
-              }}
-              style={{
-                position: 'absolute',
-                top: '-8px',
-                right: '-8px',
-                zIndex: 10010,
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                borderRadius: '50%',
-                minWidth: '32px',
-                width: '32px',
-                height: '32px',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-              }}
-            >
-              <Icons.X />
-            </IconButton>
-          )}
-          {/* Background image opacity overlay */}
-          {themeConfig.backgroundImageUrl && themeConfig.imageOpacity && themeConfig.imageOpacity < 100 && (
-            <Box
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: themeConfig.imageOpacityColor || '#000000',
-                opacity: (100 - (themeConfig.imageOpacity || 100)) / 100,
-                borderRadius: config.placement === 'centered_overlay' ? '12px' : '0',
-              }}
-            />
-          )}
-          
-          <Box style={{ position: 'relative', width: '100%', zIndex: 1 }}>
-            <CountDownTemplate
-              clockConfig={{
-                labelPosition: selectedClockConfig.labelPosition,
-                numberStyle: selectedClockConfig.numberStyle,
-                endDate: config.timerMode === 'start-to-finish-timer' ? (endDate || new Date()) : undefined,
-                endTime: config.timerMode === 'start-to-finish-timer' ? getEndTimeString() : undefined,
-                backgroundColor: selectedClockConfig.backgroundColor,
-                textColor: selectedClockConfig.textColor,
-                timerMode: config.timerMode,
-                remainingTimePeriod: config.timerConfig?.remainingTimePeriod,
-                remainingTimePeriodUnit: config.timerConfig?.remainingTimePeriodUnit,
-                countFrom: config.timerConfig?.countPeriodStart ?? config.timerConfig?.countFrom,
-                countTo: config.timerConfig?.countTo,
-                countFrequency: config.timerConfig?.countFrequency,
-                countDirection: config.timerConfig?.countDirection || 'ascending',
-                displayOptions: config.timerConfig?.displayOptions,
-              }}
-              layout={selectedLayout}
-              title={config.title || "Flash Sale"}
-              subTitle={config.subtitle || config.message || "Limited Stock"}
-              buttonText={config.buttonText || "Shop Now"}
-              buttonLink={config.buttonLink || "https://example.com/shop"}
-              scale={1}
-              titleColor={themeConfig.titleColor}
-              titleOpacity={themeConfig.titleOpacity}
-              subtitleColor={themeConfig.subtitleColor}
-              subtitleOpacity={themeConfig.subtitleOpacity}
-              countdownBoxBackgroundColor={themeConfig.countdownBoxBackgroundColor}
-              countdownBoxBackgroundOpacity={themeConfig.countdownBoxBackgroundOpacity}
-              countdownBoxTextColor={themeConfig.countdownBoxTextColor}
-              countdownBoxTextOpacity={themeConfig.countdownBoxTextOpacity}
-              buttonBackgroundColor={themeConfig.buttonBackgroundColor}
-              buttonBackgroundOpacity={themeConfig.buttonBackgroundOpacity}
-              buttonTextColor={themeConfig.buttonTextColor}
-              buttonTextOpacity={themeConfig.buttonTextOpacity}
-            />
-          </Box>
+          {/* Countdown Timer Preview */}
+          <div key={config.placement} style={getPlacementStyles()}>
+            {/* Close button for centered overlay - positioned relative to the countdown timer */}
+            {config.placement === 'centered_overlay' && !isOverlayClosed && (
+              <IconButton
+                skin="dark"
+                priority="tertiary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOverlayClosed(true);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  zIndex: 10010,
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  borderRadius: '50%',
+                  minWidth: '32px',
+                  width: '32px',
+                  height: '32px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                }}
+              >
+                <Icons.X />
+              </IconButton>
+            )}
+            {/* Background image opacity overlay */}
+            {themeConfig.backgroundImageUrl && themeConfig.imageOpacity && themeConfig.imageOpacity < 100 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: themeConfig.imageOpacityColor || '#000000',
+                  opacity: (100 - (themeConfig.imageOpacity || 100)) / 100,
+                  borderRadius: config.placement === 'centered_overlay' ? '12px' : '0',
+                }}
+              />
+            )}
+
+            <div style={{ position: 'relative', width: '100%', zIndex: 1 }}>
+              <CountDownTemplate
+                clockConfig={{
+                  labelPosition: selectedClockConfig.labelPosition,
+                  numberStyle: selectedClockConfig.numberStyle,
+                  startDate: config.timerMode === 'start-to-finish-timer' ? getStartDate() : undefined,
+                  startTime: config.timerMode === 'start-to-finish-timer' ? getStartTimeString() : undefined,
+                  endDate: config.timerMode === 'start-to-finish-timer' ? (endDate || new Date()) : undefined,
+                  endTime: config.timerMode === 'start-to-finish-timer' ? getEndTimeString() : undefined,
+                  backgroundColor: selectedClockConfig.backgroundColor,
+                  textColor: selectedClockConfig.textColor,
+                  timerMode: config.timerMode,
+                  remainingTimePeriod: config.timerConfig?.remainingTimePeriod,
+                  remainingTimePeriodUnit: config.timerConfig?.remainingTimePeriodUnit,
+                  countFrom: config.timerConfig?.countPeriodStart ?? config.timerConfig?.countFrom,
+                  countTo: config.timerConfig?.countTo,
+                  countFrequency: config.timerConfig?.countFrequency,
+                  countDirection: config.timerConfig?.countDirection || (config.timerMode === 'number-counter' ? 'ascending' : 'descending'),
+                  displayOptions: config.timerConfig?.displayOptions,
+                }}
+                layout={selectedLayout}
+                title={config.title || "Flash Sale"}
+                subTitle={config.subtitle || config.message || "Limited Stock"}
+                buttonText={config.buttonText || "Shop Now"}
+                buttonLink={config.buttonLink || "https://example.com/shop"}
+                showButton={config.showButton ?? true}
+                scale={1}
+                titleColor={themeConfig.titleColor}
+                titleOpacity={themeConfig.titleOpacity}
+                subtitleColor={themeConfig.subtitleColor}
+                subtitleOpacity={themeConfig.subtitleOpacity}
+                countdownBoxBackgroundColor={themeConfig.countdownBoxBackgroundColor}
+                countdownBoxBackgroundOpacity={themeConfig.countdownBoxBackgroundOpacity}
+                countdownBoxTextColor={themeConfig.countdownBoxTextColor}
+                countdownBoxTextOpacity={themeConfig.countdownBoxTextOpacity}
+                buttonBackgroundColor={themeConfig.buttonBackgroundColor}
+                buttonBackgroundOpacity={themeConfig.buttonBackgroundOpacity}
+                buttonTextColor={themeConfig.buttonTextColor}
+                buttonTextOpacity={themeConfig.buttonTextOpacity}
+              />
+            </div>
+          </div>
         </div>
-        </Box>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

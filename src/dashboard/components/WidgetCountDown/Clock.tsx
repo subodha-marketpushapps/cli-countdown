@@ -8,6 +8,8 @@ export interface ClockProps {
   backgroundColor: string;
   textColor: string;
   // Start-to-finish timer mode
+  startDate?: Date;
+  startTime?: string; // Format: "HH:mm:ss"
   endDate?: Date;
   endTime?: string; // Format: "HH:mm:ss"
   // Personal countdown mode
@@ -39,6 +41,8 @@ interface TimeRemaining {
 const Clock: React.FC<ClockProps> = ({
   labelPosition,
   numberStyle,
+  startDate,
+  startTime,
   endDate,
   endTime,
   backgroundColor,
@@ -63,36 +67,70 @@ const Clock: React.FC<ClockProps> = ({
 
   // Start-to-finish timer mode
   useEffect(() => {
-    if (timerMode !== 'start-to-finish-timer' || !endDate || !endTime) return;
+    if (timerMode !== 'start-to-finish-timer') return;
 
-    const calculateTimeRemaining = () => {
-      const targetDate = new Date(endDate);
-      const [hours, minutes, seconds] = endTime.split(':').map(Number);
-      targetDate.setHours(hours, minutes, seconds || 0, 0);
-
+    const calculateTime = () => {
       const now = new Date().getTime();
-      const target = targetDate.getTime();
-      const difference = target - now;
 
-      if (difference <= 0) {
-        setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
+      if (countDirection === 'ascending') {
+        // Count up: calculate elapsed time from start
+        if (!startDate || !startTime) {
+          setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
+        }
+
+        const startDateTime = new Date(startDate);
+        const [hours, minutes, seconds] = startTime.split(':').map(Number);
+        startDateTime.setHours(hours, minutes, seconds || 0, 0);
+
+        const elapsed = now - startDateTime.getTime();
+
+        if (elapsed < 0) {
+          setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
+        }
+
+        // Calculate elapsed time
+        setTimeRemaining({
+          days: Math.floor(elapsed / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((elapsed % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((elapsed % (1000 * 60)) / 1000),
+        });
+      } else {
+        // Count down: calculate remaining time to end
+        if (!endDate || !endTime) {
+          setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
+        }
+
+        const targetDate = new Date(endDate);
+        const [hours, minutes, seconds] = endTime.split(':').map(Number);
+        targetDate.setHours(hours, minutes, seconds || 0, 0);
+
+        const target = targetDate.getTime();
+        const difference = target - now;
+
+        if (difference <= 0) {
+          setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
+        }
+
+        // Calculate remaining time
+        setTimeRemaining({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((difference % (1000 * 60)) / 1000),
+        });
       }
-
-      // Always calculate the full time difference, regardless of display options
-      setTimeRemaining({
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((difference % (1000 * 60)) / 1000),
-      });
     };
 
-    calculateTimeRemaining();
-    const interval = setInterval(calculateTimeRemaining, 1000);
+    calculateTime();
+    const interval = setInterval(calculateTime, 1000);
 
     return () => clearInterval(interval);
-  }, [endDate, endTime, timerMode]);
+  }, [endDate, endTime, startDate, startTime, timerMode, countDirection]);
 
   // Personal countdown mode
   useEffect(() => {
@@ -101,40 +139,63 @@ const Clock: React.FC<ClockProps> = ({
     }
 
     // Reset start time when period or unit changes - each time this effect runs, start a new countdown
-    const startTime = new Date().getTime();
+    const startTimeMs = new Date().getTime();
+
+    // Convert time period to milliseconds
+    let periodMs = 0;
+    switch (remainingTimePeriodUnit) {
+      case 'minutes':
+        periodMs = remainingTimePeriod * 60 * 1000;
+        break;
+      case 'hours':
+        periodMs = remainingTimePeriod * 60 * 60 * 1000;
+        break;
+      case 'days':
+        periodMs = remainingTimePeriod * 24 * 60 * 60 * 1000;
+        break;
+    }
 
     const calculatePersonalCountdown = () => {
       const now = new Date().getTime();
-      const elapsed = now - startTime;
+      const elapsed = now - startTimeMs;
 
-      // Convert remaining time period to milliseconds
-      let periodMs = 0;
-      switch (remainingTimePeriodUnit) {
-        case 'minutes':
-          periodMs = remainingTimePeriod * 60 * 1000;
-          break;
-        case 'hours':
-          periodMs = remainingTimePeriod * 60 * 60 * 1000;
-          break;
-        case 'days':
-          periodMs = remainingTimePeriod * 24 * 60 * 60 * 1000;
-          break;
+      if (countDirection === 'ascending') {
+        // Count up: show elapsed time
+        if (elapsed >= periodMs) {
+          // Show the full period when elapsed exceeds it
+          setTimeRemaining({
+            days: Math.floor(periodMs / (1000 * 60 * 60 * 24)),
+            hours: Math.floor((periodMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+            minutes: Math.floor((periodMs % (1000 * 60 * 60)) / (1000 * 60)),
+            seconds: Math.floor((periodMs % (1000 * 60)) / 1000),
+          });
+          return;
+        }
+
+        // Calculate elapsed time
+        setTimeRemaining({
+          days: Math.floor(elapsed / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((elapsed % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((elapsed % (1000 * 60)) / 1000),
+        });
+      } else {
+        // Count down: show remaining time
+        const remaining = periodMs - elapsed;
+
+        if (remaining <= 0) {
+          setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
+        }
+
+        // Calculate remaining time
+        setTimeRemaining({
+          days: Math.floor(remaining / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((remaining % (1000 * 60)) / 1000),
+        });
       }
-
-      const remaining = periodMs - elapsed;
-
-      if (remaining <= 0) {
-        setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      // Always calculate the full time difference, regardless of display options
-      setTimeRemaining({
-        days: Math.floor(remaining / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((remaining % (1000 * 60)) / 1000),
-      });
     };
 
     // Calculate immediately
@@ -144,7 +205,7 @@ const Clock: React.FC<ClockProps> = ({
     const interval = setInterval(calculatePersonalCountdown, 1000);
 
     return () => clearInterval(interval);
-  }, [timerMode, remainingTimePeriod, remainingTimePeriodUnit]);
+  }, [timerMode, remainingTimePeriod, remainingTimePeriodUnit, countDirection]);
 
   // Number counter mode
   useEffect(() => {

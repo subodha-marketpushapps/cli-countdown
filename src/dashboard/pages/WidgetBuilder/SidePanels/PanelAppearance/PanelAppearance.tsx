@@ -43,6 +43,28 @@ const PanelAppearance: React.FC<Props> = ({
 }) => {
     const [showCustomizeTheme, setShowCustomizeTheme] = useState(false);
 
+    // Helper function to get startDate from config with fallback
+    const getStartDate = (): Date => {
+        if (config.timerConfig?.startDate) {
+            return new Date(config.timerConfig.startDate);
+        }
+        // Default fallback: today
+        return new Date();
+    };
+
+    // Helper function to format startTime Date to "HH:mm:ss" string
+    const getStartTimeString = (): string => {
+        if (config.timerConfig?.startTime) {
+            const time = new Date(config.timerConfig.startTime);
+            const hours = String(time.getHours()).padStart(2, '0');
+            const minutes = String(time.getMinutes()).padStart(2, '0');
+            const seconds = String(time.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+        // Default fallback: start of day
+        return "00:00:00";
+    };
+
     // Helper function to get endDate from config with fallback
     const getEndDate = (): Date => {
         if (config.timerConfig?.endDate) {
@@ -68,6 +90,8 @@ const PanelAppearance: React.FC<Props> = ({
     };
 
     // Get date and time from config
+    const startDate = getStartDate();
+    const startTime = getStartTimeString();
     const endDate = getEndDate();
     const endTime = getEndTimeString();
 
@@ -157,6 +181,8 @@ const PanelAppearance: React.FC<Props> = ({
     const getClockConfig = () => {
         return {
             ...selectedClockConfig,
+            startDate: config.timerMode === 'start-to-finish-timer' ? startDate : undefined,
+            startTime: config.timerMode === 'start-to-finish-timer' ? startTime : undefined,
             endDate: config.timerMode === 'start-to-finish-timer' ? endDate : undefined,
             endTime: config.timerMode === 'start-to-finish-timer' ? endTime : undefined,
             timerMode: config.timerMode,
@@ -165,7 +191,7 @@ const PanelAppearance: React.FC<Props> = ({
             countFrom: config.timerConfig?.countPeriodStart ?? config.timerConfig?.countFrom,
             countTo: config.timerConfig?.countTo,
             countFrequency: config.timerConfig?.countFrequency,
-            countDirection: config.timerConfig?.countDirection || 'ascending',
+            countDirection: config.timerConfig?.countDirection || (config.timerMode === 'number-counter' ? 'ascending' : 'descending'),
             displayOptions: config.timerConfig?.displayOptions,
         };
     };
@@ -195,6 +221,7 @@ const PanelAppearance: React.FC<Props> = ({
                         subTitle={config.subtitle || "Limited Stock"}
                         buttonText={config.buttonText || "Shop Now"}
                         buttonLink={config.buttonLink || "https://example.com/shop"}
+                        showButton={config.showButton ?? true}
                         scale={0.65}
                         titleColor={themeConfig.titleColor}
                         titleOpacity={themeConfig.titleOpacity}
@@ -223,6 +250,7 @@ const PanelAppearance: React.FC<Props> = ({
                         subTitle={config.subtitle || "Limited Stock"}
                         buttonText={config.buttonText || "View Deals"}
                         buttonLink={config.buttonLink || "https://example.com/deals"}
+                        showButton={config.showButton ?? true}
                         scale={0.65}
                         titleColor={themeConfig.titleColor}
                         titleOpacity={themeConfig.titleOpacity}
@@ -251,6 +279,7 @@ const PanelAppearance: React.FC<Props> = ({
                         subTitle={config.subtitle || "Limited Stock"}
                         buttonText={config.buttonText || "Buy Now"}
                         buttonLink={config.buttonLink || "https://example.com/buy"}
+                        showButton={config.showButton ?? true}
                         scale={0.65}
                         titleColor={themeConfig.titleColor}
                         titleOpacity={themeConfig.titleOpacity}
@@ -279,6 +308,7 @@ const PanelAppearance: React.FC<Props> = ({
                         subTitle={config.subtitle || "Limited Stock"}
                         buttonText={config.buttonText || "Buy Now"}
                         buttonLink={config.buttonLink || "https://example.com/buy"}
+                        showButton={config.showButton ?? true}
                         scale={0.65}
                         titleColor={themeConfig.titleColor}
                         titleOpacity={themeConfig.titleOpacity}
@@ -307,6 +337,7 @@ const PanelAppearance: React.FC<Props> = ({
                         subTitle={config.subtitle || "Limited Stock"}
                         buttonText={config.buttonText || "Shop Now"}
                         buttonLink={config.buttonLink || "https://example.com/shop"}
+                        showButton={config.showButton ?? true}
                         scale={0.65}
                         titleColor={themeConfig.titleColor}
                         titleOpacity={themeConfig.titleOpacity}
@@ -335,6 +366,7 @@ const PanelAppearance: React.FC<Props> = ({
                         subTitle={config.subtitle || "Limited Stock"}
                         buttonText={config.buttonText || "View Deals"}
                         buttonLink={config.buttonLink || "https://example.com/deals"}
+                        showButton={config.showButton ?? true}
                         scale={0.65}
                         titleColor={themeConfig.titleColor}
                         titleOpacity={themeConfig.titleOpacity}
@@ -363,6 +395,7 @@ const PanelAppearance: React.FC<Props> = ({
                         subTitle={config.subtitle || "Limited Stock"}
                         buttonText={config.buttonText || "Buy Now"}
                         buttonLink={config.buttonLink || "https://example.com/buy"}
+                        showButton={config.showButton ?? true}
                         scale={0.5}
                         titleColor={themeConfig.titleColor}
                         titleOpacity={themeConfig.titleOpacity}
@@ -391,6 +424,7 @@ const PanelAppearance: React.FC<Props> = ({
                         subTitle={config.subtitle || "Limited Stock"}
                         buttonText={config.buttonText || "Buy Now"}
                         buttonLink={config.buttonLink || "https://example.com/buy"}
+                        showButton={config.showButton ?? true}
                         scale={0.5}
                         titleColor={themeConfig.titleColor}
                         titleOpacity={themeConfig.titleOpacity}
@@ -610,6 +644,7 @@ const PanelAppearance: React.FC<Props> = ({
                             subTitle={config.subtitle || "Limited Stock"}
                             buttonText={config.buttonText || "Shop Now"}
                             buttonLink={config.buttonLink || "https://example.com/shop"}
+                            showButton={config.showButton ?? true}
                             scale={0.5}
                             titleColor={themeConfigForPreview?.titleColor}
                             titleOpacity={themeConfigForPreview?.titleOpacity}

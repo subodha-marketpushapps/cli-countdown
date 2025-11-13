@@ -17,6 +17,7 @@ export interface CountdownBannerProps {
   subTitle: string;
   buttonText: string;
   buttonLink: string;
+  showButton?: boolean;
   scale?: number;
   layout?: TemplateLayout;
   // Optional theme config colors
@@ -40,6 +41,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
   subTitle,
   buttonText,
   buttonLink,
+  showButton = true,
   scale = 1,
   layout = 'title-subtitle-timer-button',
   titleColor,
@@ -77,7 +79,6 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
     display: 'flex',
     flexDirection: 'column',
     gap: `${8 * scale}px`,
-    flex: '1',
     minWidth: 0,
     justifyContent: 'space-between',
   };
@@ -137,7 +138,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
     const titleEl = <Text weight="bold" style={titleStyle}>{title}</Text>;
     const subtitleEl = <Text size="small" style={subTitleStyle}>{subTitle}</Text>;
     const timerEl = <Clock {...finalClockConfig} />;
-    const buttonEl = (
+    const buttonEl = showButton ? (
       <Button
         priority="primary"
         onClick={() => {
@@ -149,7 +150,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
       >
         {buttonText}
       </Button>
-    );
+    ) : null;
 
     switch (layout) {
       case 'title-timer-button':
@@ -157,7 +158,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
           <>
             <Box style={textContainerStyle}>{titleEl}</Box>
             <Box style={{ flexShrink: 0 }}>{timerEl}</Box>
-            <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>
+            {showButton && <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>}
           </>
         );
       
@@ -169,7 +170,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
               {subtitleEl}
             </Box>
             <Box style={{ flexShrink: 0 }}>{timerEl}</Box>
-            <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>
+            {showButton && <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>}
           </>
         );
       
@@ -180,7 +181,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
             <Box style={{ flexShrink: 0 }}>{timerEl}</Box>
             <Box style={textContainerStyle}>
               {subtitleEl}
-              {buttonEl}
+              {showButton && buttonEl}
             </Box>
           </>
         );
@@ -193,7 +194,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
               {subtitleEl}
             </Box>
             <Box style={{ flexShrink: 0 }}>{timerEl}</Box>
-            <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>
+            {showButton && <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>}
           </>
         );
       
@@ -205,7 +206,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
               {titleEl}
               {subtitleEl}
             </Box>
-            <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>
+            {showButton && <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>}
           </>
         );
       
@@ -216,7 +217,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
               {titleEl}
               {subtitleEl}
             </Box>
-            <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>
+            {showButton && <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>}
             <Box style={{ flexShrink: 0 }}>{timerEl}</Box>
           </>
         );
@@ -229,7 +230,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
               {subtitleEl}
             </Box>
             <Box style={{ flexShrink: 0 }}>{timerEl}</Box>
-            <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>
+            {showButton && <Box style={{ flexShrink: 0 }}>{buttonEl}</Box>}
           </>
         );
     }
