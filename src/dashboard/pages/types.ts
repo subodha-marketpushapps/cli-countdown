@@ -35,6 +35,7 @@ export interface TimerConfig {
   showCloseButton?: boolean;
   // Appearance settings
   selectedTemplate?: string;
+  mobileLayout?: 'vertical' | 'horizontal';
   selectedClockStyle?: string;
   selectedTheme?: string;
   labelPosition?: 'top' | 'bottom';

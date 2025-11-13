@@ -48,6 +48,7 @@ export const createDefaultTimerConfig = (): TimerConfig => {
     title: 'Countdown Timer',
     message: 'Time remaining until the event',
     selectedTemplate: 'template-1',
+    mobileLayout: 'vertical',
     selectedClockStyle: '1',
     selectedTheme: getFirstThemeId(),
     themeConfig: getFirstThemeConfig(),

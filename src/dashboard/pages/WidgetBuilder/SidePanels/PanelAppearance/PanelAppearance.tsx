@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Layout, FormField, SidePanel, Input, Box, Text, ToggleSwitch, Image } from "@wix/design-system";
+import { Layout, FormField, SidePanel, Input, Box, Text, ToggleSwitch, Image, Tabs } from "@wix/design-system";
 import { Edit as EditIcon } from "@wix/wix-ui-icons-common";
 import { TimerConfig } from "../../../types";
 import { renderSectionTitle } from "../utils/renderSectionTitle";
@@ -7,6 +7,10 @@ import { DEFAULT_PANEL_WIDTH } from "../SidePanelContainer";
 import CountDownTemplate, { CountdownBannerProps, TemplateLayout } from "../../../../components/WidgetCountDown/CountDownTemplate";
 import Carousel, { CarouselItem } from "../../../../components/common/Carousel";
 import CustomizeTheme from "./CostomizeTheme";
+import DesktopAppearance from "./DesktopAppearance";
+import MobileAppearance from "./MobileAppearance";
+import ClockStyleImage from "./ClockStyleImage";
+
 
 // Import template background images
 import blackFridayImage from "../../../../../assets/images/template-background/black _friday.png";
@@ -42,6 +46,7 @@ const PanelAppearance: React.FC<Props> = ({
     previewControl,
 }) => {
     const [showCustomizeTheme, setShowCustomizeTheme] = useState(false);
+    const [activeTab, setActiveTab] = useState(0);
 
     // Helper function to get startDate from config with fallback
     const getStartDate = (): Date => {
@@ -213,7 +218,7 @@ const PanelAppearance: React.FC<Props> = ({
         {
             id: "template-1",
             content: (
-                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                <div style={{ backgroundColor: "#C4DCFFFF" }}>
                     <CountDownTemplate
                         clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-1']}
@@ -242,7 +247,7 @@ const PanelAppearance: React.FC<Props> = ({
         {
             id: "template-2",
             content: (
-                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                <div style={{ backgroundColor: "#C4DCFFFF" }}>
                     <CountDownTemplate
                         clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-2']}
@@ -271,7 +276,7 @@ const PanelAppearance: React.FC<Props> = ({
         {
             id: "template-3",
             content: (
-                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                <div style={{ backgroundColor: "#C4DCFFFF" }}>
                     <CountDownTemplate
                         clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-3']}
@@ -300,7 +305,7 @@ const PanelAppearance: React.FC<Props> = ({
         {
             id: "template-4",
             content: (
-                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                <div style={{ backgroundColor: "#C4DCFFFF" }}>
                     <CountDownTemplate
                         clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-4']}
@@ -329,7 +334,7 @@ const PanelAppearance: React.FC<Props> = ({
         {
             id: "template-5",
             content: (
-                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                <div style={{ backgroundColor: "#C4DCFFFF" }}>
                     <CountDownTemplate
                         clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-5']}
@@ -358,7 +363,7 @@ const PanelAppearance: React.FC<Props> = ({
         {
             id: "template-6",
             content: (
-                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                <div style={{ backgroundColor: "#C4DCFFFF" }}>
                     <CountDownTemplate
                         clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-6']}
@@ -387,7 +392,7 @@ const PanelAppearance: React.FC<Props> = ({
         {
             id: "template-7",
             content: (
-                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                <div style={{ backgroundColor: "#C4DCFFFF" }}>
                     <CountDownTemplate
                         clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-7']}
@@ -416,7 +421,7 @@ const PanelAppearance: React.FC<Props> = ({
         {
             id: "template-8",
             content: (
-                <div style={{backgroundColor: "#C4DCFFFF"}}>
+                <div style={{ backgroundColor: "#C4DCFFFF" }}>
                     <CountDownTemplate
                         clockConfig={getClockConfig()}
                         layout={templateLayoutMap['template-8']}
@@ -444,86 +449,59 @@ const PanelAppearance: React.FC<Props> = ({
         },
     ];
 
+    // Primary button color - used for SVG fills
+    const primaryButtonColor = '#2563eb';
+
     // Clock configurations for the carousel
     const clockItems: CarouselItem[] = [
         {
             id: "1",
-            label: "Fill Each Digit",
             content: (
-                <Box width="100%" align="center" padding="24px" backgroundColor="#C4DCFFFF" style={{ borderRadius: "0" }}>
-                    <Image
-                        src={timer1Image}
-                        alt="Fill Each Digit"
-                        width="100%"
-                        height="auto"
-                        borderRadius={'0px'}
-                        style={{ maxWidth: "100%", borderRadius: "0" }}
-                    />
-                </Box>
+                <ClockStyleImage
+                    svgPath={timer1Image}
+                    alt="Fill Each Digit"
+                    fillColor={primaryButtonColor}
+                />
             ),
         },
         {
             id: "2",
-            label: "Outline Each Digit",
             content: (
-                <Box width="100%" align="center" style={{ padding: "10px", borderRadius: "0" }}>
-                    <Image
-                        src={timer2Image}
-                        alt="Outline Each Digit"
-                        width="100%"
-                        height="auto"
-                        borderRadius={'0px'}
-                        style={{ maxWidth: "100%", borderRadius: "0" }}
-                    />
-                </Box>
+                <ClockStyleImage
+                    svgPath={timer2Image}
+                    alt="Outline Each Digit"
+                    fillColor={primaryButtonColor}
+                />
             ),
         },
         {
             id: "3",
-            label: "Filled Box",
             content: (
-                <Box width="100%" align="center" style={{ padding: "10px", borderRadius: "0" }}>
-                    <Image
-                        src={timer3Image}
-                        alt="Filled Box"
-                        width="100%"
-                        height="auto"
-                        borderRadius={'0px'}
-                        style={{ maxWidth: "100%", borderRadius: "0" }}
-                    />
-                </Box>
+                <ClockStyleImage
+                    svgPath={timer3Image}
+                    alt="Filled Box"
+                    fillColor={primaryButtonColor}
+                />
             ),
         },
         {
             id: "4",
-            label: "Outline Box",
             content: (
-                <Box width="100%" align="center" style={{ padding: "10px", borderRadius: "0" }}>
-                    <Image
-                        src={timer4Image}
-                        alt="Outline Box"
-                        width="100%"
-                        height="auto"
-                        borderRadius={'0px'}
-                        style={{ maxWidth: "100%", borderRadius: "0" }}
-                    />
-                </Box>
+                <ClockStyleImage
+                    svgPath={timer4Image}
+                    alt="Outline Box"
+                    fillColor={primaryButtonColor}
+                />
             ),
         },
         {
             id: "5",
-            label: "Minimal Style",
             content: (
-                <Box width="100%" align="center" style={{ padding: "10px", borderRadius: "0" }}>
-                    <Image
-                        src={timer5Image}
-                        alt="Minimal Style"
-                        width="100%"
-                        height="auto"
-                        borderRadius={'0px'}
-                        style={{ maxWidth: "100%", borderRadius: "0" }}
-                    />
-                </Box>
+                <ClockStyleImage
+                    svgPath={timer5Image}
+                    alt="Minimal Style"
+                    fillColor={primaryButtonColor}
+                />
             ),
         },
     ];
@@ -594,22 +572,22 @@ const PanelAppearance: React.FC<Props> = ({
     const themeItems: CarouselItem[] = themeDefinitions.map(({ image, fileName, colors }) => {
         const { id, label } = getThemeIdAndLabel(fileName);
         const themeConfigForPreview = themeConfigMap[id];
-        
+
         return {
             id,
             label,
             content: (
-                <Box 
-                    width="100%" 
-                    align="center" 
-                    style={{ 
-                        padding: "10px", 
+                <Box
+                    width="100%"
+                    align="center"
+                    style={{
+                        padding: "10px",
                         borderRadius: "8px",
-                        backgroundColor: themeConfigForPreview?.backgroundImageUrl 
-                            ? 'transparent' 
+                        backgroundColor: themeConfigForPreview?.backgroundImageUrl
+                            ? 'transparent'
                             : (themeConfigForPreview?.backgroundColor || "#F5F5F5"),
-                        backgroundImage: themeConfigForPreview?.backgroundImageUrl 
-                            ? `url(${themeConfigForPreview.backgroundImageUrl})` 
+                        backgroundImage: themeConfigForPreview?.backgroundImageUrl
+                            ? `url(${themeConfigForPreview.backgroundImageUrl})`
                             : undefined,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
@@ -665,23 +643,6 @@ const PanelAppearance: React.FC<Props> = ({
         };
     });
 
-    // Get initial carousel indices based on selected values
-    const getTemplateIndex = () => {
-        const index = templateItems.findIndex(item => item.id === config.selectedTemplate);
-        return index >= 0 ? index : 0;
-    };
-
-    const getClockStyleIndex = () => {
-        const index = clockItems.findIndex(item => item.id === config.selectedClockStyle);
-        return index >= 0 ? index : 0;
-    };
-
-    const getThemeIndex = () => {
-        const index = themeItems.findIndex(item => item.id === config.selectedTheme);
-        return index >= 0 ? index : 0;
-    };
-
-
     const handleCloseSidePanel = () => {
         onCloseButtonClick();
     };
@@ -729,108 +690,39 @@ const PanelAppearance: React.FC<Props> = ({
             onCloseButtonClick={handleCloseSidePanel}
             width={DEFAULT_PANEL_WIDTH}
         >
-            <SidePanel.Header title="Appearance" showDivider={true}></SidePanel.Header>
+            <SidePanel.Header title="Appearance" showDivider={true}>
+                <Tabs
+                    items={[
+                        { id: 0, title: "Desktop" },
+                        { id: 1, title: "Mobile" },
+                    ]}
+                    activeId={activeTab}
+                    type="uniformSide"
+                    width="114px"
+                    onClick={(value) => setActiveTab(Number(value.id))}
+                />
+            </SidePanel.Header>
 
             <SidePanel.Content noPadding>
-                <SidePanel.Section title={renderSectionTitle("Template", "Choose a layout style for your countdown bar. Each template changes how the Title, Subtitle, Timer, and Button are positioned. Positions are pre-defined and not editable.")}>
-                    <SidePanel.Field divider={false}>
-                        <FormField>
-                            <div style={{margin: "8px"}}>
-                                <Carousel
-                                    items={templateItems}
-                                    autoSlide={false}
-                                    showNavigation={true}
-                                    showDots={true}
-                                    navigationPosition="bottom"
-                                    initialIndex={getTemplateIndex()}
-                                    onSlideChange={(index: number) => {
-                                        const selectedTemplate = templateItems[index]?.id;
-                                        if (selectedTemplate) {
-                                            onChange({ 
-                                                ...config, 
-                                                selectedTemplate,
-                                            });
-                                        }
-                                    }}
-                                />
-                            </div>
-                        </FormField>
-                    </SidePanel.Field>
-                </SidePanel.Section>
-
-                <SidePanel.Section title={renderSectionTitle("Clock Style", "Configure the clock number styles (Filled, Outlined, Filled Each Number, Outline Each Number, None) and label position (Top, Bottom).")}>
-                    <SidePanel.Field divider={false}>
-                        <FormField>
-                            <Box width="100%" direction="vertical" style={{ padding: "16px 0" }}>
-                                <Carousel
-                                    items={clockItems}
-                                    autoSlide={false}
-                                    showNavigation={true}
-                                    showDots={true}
-                                    navigationPosition="bottom"
-                                    initialIndex={getClockStyleIndex()}
-                                    onSlideChange={(index: number) => {
-                                        const selectedClockStyle = clockItems[index]?.id;
-                                        if (selectedClockStyle) {
-                                            const clockStyleProps = clockStyleMap[selectedClockStyle];
-                                            if (clockStyleProps) {
-                                                onChange({ 
-                                                    ...config, 
-                                                    selectedClockStyle,
-                                                    numberStyle: clockStyleProps.numberStyle,
-                                                    backgroundColor: clockStyleProps.backgroundColor,
-                                                    textColor: clockStyleProps.textColor,
-                                                    labelPosition: clockStyleProps.labelPosition,
-                                                });
-                                            } else {
-                                                onChange({ ...config, selectedClockStyle });
-                                            }
-                                        }
-                                    }}
-                                />
-                            </Box>
-                        </FormField>
-                    </SidePanel.Field>
-                </SidePanel.Section>
-
-                <SidePanel.Section title={renderSectionTitle("Theme", "Includes background image or color, title color, subtitle color, countdown box colors, and button colors.", "Customize", (<EditIcon />), handleShowCustomizeThemeModal)}>
-                    <SidePanel.Field divider={false}>
-                        <FormField>
-                            <Box width="100%" direction="vertical" style={{ padding: "16px 0" }}>
-                                <Carousel
-                                    items={themeItems}
-                                    autoSlide={false}
-                                    showNavigation={true}
-                                    showDots={true}
-                                    navigationPosition="bottom"
-                                    initialIndex={getThemeIndex()}
-                                    onSlideChange={(index: number) => {
-                                        const selectedTheme = themeItems[index]?.id;
-                                        if (selectedTheme) {
-                                            const themeConfig = themeConfigMap[selectedTheme];
-                                            onChange({ 
-                                                ...config, 
-                                                selectedTheme,
-                                                themeConfig: themeConfig ? {
-                                                    ...config.themeConfig,
-                                                    ...themeConfig,
-                                                } : config.themeConfig,
-                                            });
-                                        }
-                                    }}
-                                />
-                            </Box>
-                        </FormField>
-                    </SidePanel.Field>
-                </SidePanel.Section>
-
-                {/* <SidePanel.Section title={renderSectionTitle("Font", "Chose the font style for your countdown text to align with your website's branding")}>
-                    <SidePanel.Field divider={false}>
-                        <FormField>
-
-                        </FormField>
-                    </SidePanel.Field>
-                </SidePanel.Section> */}
+                {activeTab === 0 ? (
+                    <DesktopAppearance
+                        config={config}
+                        onChange={onChange}
+                        templateItems={templateItems}
+                        clockItems={clockItems}
+                        themeItems={themeItems}
+                        clockStyleMap={clockStyleMap}
+                        themeConfigMap={themeConfigMap}
+                        onShowCustomizeTheme={handleShowCustomizeThemeModal}
+                    />
+                ) : (
+                    <MobileAppearance
+                        config={config}
+                        onChange={onChange}
+                        clockConfig={getClockConfig()}
+                        themeConfig={themeConfig}
+                    />
+                )}
             </SidePanel.Content>
 
         </SidePanel>

@@ -115,6 +115,9 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
           if (params.selectedTemplate) {
             loadedConfig.selectedTemplate = params.selectedTemplate as string;
           }
+          if (params.mobileLayout && ['vertical', 'horizontal'].includes(params.mobileLayout as string)) {
+            loadedConfig.mobileLayout = params.mobileLayout as 'vertical' | 'horizontal';
+          }
           if (params.selectedClockStyle) {
             loadedConfig.selectedClockStyle = params.selectedClockStyle as string;
           }
@@ -287,6 +290,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
         openInNewTab: config.openInNewTab ?? true,
         showCloseButton: config.showCloseButton ?? true,
         selectedTemplate: config.selectedTemplate || 'template-1',
+        mobileLayout: config.mobileLayout || 'vertical',
         selectedClockStyle: config.selectedClockStyle || '1',
         selectedTheme: config.selectedTheme || getFirstThemeId(),
         labelPosition: config.labelPosition || 'bottom',
