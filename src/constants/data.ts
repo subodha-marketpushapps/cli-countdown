@@ -3,6 +3,7 @@ import { WidgetContent, WidgetStyles, WidgetVisibilityData } from '../interfaces
 import { WixSiteData } from '../interfaces/common/wix-site-data.interface';
 import { Settings } from '../interfaces/common/settings.interface';
 import { Stats } from '../interfaces/custom/stats-interface';
+import { getFirstThemeId, getFirstThemeConfig } from '../dashboard/pages/WidgetBuilder/SidePanels/PanelAppearance/themeUtils';
 
 /**
  * Creates a default TimerConfig with initial values
@@ -48,7 +49,8 @@ export const createDefaultTimerConfig = (): TimerConfig => {
     message: 'Time remaining until the event',
     selectedTemplate: 'template-1',
     selectedClockStyle: '1',
-    selectedTheme: 'theme-1',
+    selectedTheme: getFirstThemeId(),
+    themeConfig: getFirstThemeConfig(),
     labelPosition: 'top',
     numberStyle: 'fillEachDigit',
     backgroundColor: '#2563eb',

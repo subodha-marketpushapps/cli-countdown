@@ -1,6 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Box, Text } from '@wix/design-system';
 import './Clock.css';
+
+// Helper function to get responsive font size based on window width
+// This will be called with windowWidth parameter from component state
+const getResponsiveFontSize = (baseSize: number, windowWidth: number = typeof window !== 'undefined' ? window.innerWidth : 1920): number => {
+  let multiplier = 1;
+  
+  if (windowWidth < 480) {
+    // Mobile small (< 480px)
+    multiplier = 0.75;
+  } else if (windowWidth < 768) {
+    // Mobile (480px - 768px)
+    multiplier = 0.85;
+  } else if (windowWidth < 1024) {
+    // Tablet (768px - 1024px)
+    multiplier = 0.95;
+  } else if (windowWidth < 1440) {
+    // Desktop small (1024px - 1440px)
+    multiplier = 1;
+  } else {
+    // Desktop large (>= 1440px)
+    multiplier = 1.1;
+  }
+  
+  return baseSize * multiplier;
+};
 
 export interface ClockProps {
   labelPosition: 'top' | 'bottom';
@@ -64,6 +89,23 @@ const Clock: React.FC<ClockProps> = ({
   });
 
   const [counterValue, setCounterValue] = useState<number>(countFrom);
+  
+  // Track window width for responsive font sizing
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1920);
+  
+  useEffect(() => {
+    // Set initial width
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+    }
+    
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Start-to-finish timer mode
   useEffect(() => {
@@ -244,6 +286,74 @@ const Clock: React.FC<ClockProps> = ({
     return String(num).padStart(2, '0');
   };
 
+  // Memoize font sizes to recalculate when windowWidth changes
+  const numberFontSize = useMemo(() => 
+    getResponsiveFontSize(numberStyle === 'filled' || numberStyle === 'outline' ? 20 : 18, windowWidth),
+    [numberStyle, windowWidth]
+  );
+  
+  const labelFontSize = useMemo(() => 
+    getResponsiveFontSize(12, windowWidth),
+    [windowWidth]
+  );
+
+  // Memoize numberStyleMap to recalculate when font sizes change
+  const numberStyleMap: Record<string, React.CSSProperties> = useMemo(() => ({
+    fillEachDigit: {
+      backgroundColor: backgroundColor,
+      color: textColor,
+      padding: '8px 12px',
+      borderRadius: '4px',
+      fontWeight: 'bold',
+      fontSize: `${numberFontSize}px`,
+      border: 'none',
+    },
+    outlineEachDigit: {
+      backgroundColor: 'transparent',
+      color: textColor,
+      padding: '8px 12px',
+      borderRadius: '4px',
+      fontWeight: 'bold',
+      fontSize: `${numberFontSize}px`,
+      border: `2px solid ${textColor}`,
+    },
+    filled: {
+      backgroundColor: backgroundColor,
+      color: textColor,
+      padding: '12px 16px',
+      borderRadius: '6px',
+      fontWeight: 'bold',
+      fontSize: `${numberFontSize}px`,
+      border: 'none',
+    },
+    outline: {
+      backgroundColor: 'transparent',
+      color: textColor,
+      padding: '12px 16px',
+      borderRadius: '6px',
+      fontWeight: 'bold',
+      fontSize: `${numberFontSize}px`,
+      border: `2px solid ${textColor}`,
+    },
+    none: {
+      backgroundColor: 'transparent',
+      color: textColor,
+      padding: '8px',
+      borderRadius: '0',
+      fontWeight: 'bold',
+      fontSize: `${numberFontSize}px`,
+      border: 'none',
+    },
+  }), [backgroundColor, textColor, numberFontSize]);
+
+  const labelStyle: React.CSSProperties = useMemo(() => ({
+    fontSize: `${labelFontSize}px`,
+    color: textColor,
+    marginTop: labelPosition === 'bottom' ? '4px' : '0',
+    marginBottom: labelPosition === 'top' ? '4px' : '0',
+    opacity: 0.8,
+  }), [labelFontSize, textColor, labelPosition]);
+
   const renderDigit = (value: string, label: string) => {
     const digitBoxStyle: React.CSSProperties = {
       display: 'flex',
@@ -254,78 +364,22 @@ const Clock: React.FC<ClockProps> = ({
       margin: '0 4px',
     };
 
-    const numberStyleMap: Record<string, React.CSSProperties> = {
-      fillEachDigit: {
-        backgroundColor: backgroundColor,
-        color: textColor,
-        padding: '8px 12px',
-        borderRadius: '4px',
-        fontWeight: 'bold',
-        fontSize: '18px',
-        border: 'none',
-      },
-      outlineEachDigit: {
-        backgroundColor: 'transparent',
-        color: textColor,
-        padding: '8px 12px',
-        borderRadius: '4px',
-        fontWeight: 'bold',
-        fontSize: '18px',
-        border: `2px solid ${textColor}`,
-      },
-      filled: {
-        backgroundColor: backgroundColor,
-        color: textColor,
-        padding: '12px 16px',
-        borderRadius: '6px',
-        fontWeight: 'bold',
-        fontSize: '20px',
-        border: 'none',
-      },
-      outline: {
-        backgroundColor: 'transparent',
-        color: textColor,
-        padding: '12px 16px',
-        borderRadius: '6px',
-        fontWeight: 'bold',
-        fontSize: '20px',
-        border: `2px solid ${textColor}`,
-      },
-      none: {
-        backgroundColor: 'transparent',
-        color: textColor,
-        padding: '8px',
-        borderRadius: '0',
-        fontWeight: 'bold',
-        fontSize: '18px',
-        border: 'none',
-      },
-    };
-
-    const labelStyle: React.CSSProperties = {
-      fontSize: '12px',
-      color: textColor,
-      marginTop: labelPosition === 'bottom' ? '4px' : '0',
-      marginBottom: labelPosition === 'top' ? '4px' : '0',
-      opacity: 0.8,
-    };
-
     return (
       <Box style={digitBoxStyle}>
         {labelPosition === 'top' && (
-          <Text size="tiny" style={labelStyle}>
+          <span style={{ ...labelStyle, fontSize: `${labelFontSize}px`, color: numberStyleMap[numberStyle].backgroundColor }}>
             {label}
-          </Text>
+          </span>
         )}
         <Box style={numberStyleMap[numberStyle]}>
-          <Text weight="bold" style={{ color: numberStyleMap[numberStyle].color }}>
+          <span style={{ color: numberStyleMap[numberStyle].color, fontSize: `${numberFontSize}px`, fontWeight: 'bold' }}>
             {value}
-          </Text>
+          </span>
         </Box>
         {labelPosition === 'bottom' && (
-          <Text size="tiny" style={labelStyle}>
+          <span style={{ ...labelStyle, fontSize: `${labelFontSize}px` }}>
             {label}
-          </Text>
+          </span>
         )}
       </Box>
     );

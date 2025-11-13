@@ -18,6 +18,7 @@ import WidgetBuilderBackground from './WidgetBuilderBackground';
 import PreviewArea from '../PreviewArea';
 import { TimerConfig } from '../types';
 import { createDefaultTimerConfig } from '../../../constants';
+import { getFirstThemeId, getFirstThemeConfig } from './SidePanels/PanelAppearance/themeUtils';
 
 // Component ID from embedded.json
 const EMBEDDED_SCRIPT_COMPONENT_ID = '3a1cc044-7e31-4f0c-aefb-1113d572f101';
@@ -119,6 +120,18 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
           }
           if (params.selectedTheme) {
             loadedConfig.selectedTheme = params.selectedTheme as string;
+          } else {
+            // Apply first theme if no theme is selected
+            loadedConfig.selectedTheme = getFirstThemeId();
+            loadedConfig.themeConfig = getFirstThemeConfig();
+          }
+
+          // Apply first theme config if theme is selected but themeConfig is missing
+          if (loadedConfig.selectedTheme && !loadedConfig.themeConfig) {
+            // If the selected theme is the first theme, apply its config
+            if (loadedConfig.selectedTheme === getFirstThemeId()) {
+              loadedConfig.themeConfig = getFirstThemeConfig();
+            }
           }
           if (params.labelPosition && ['top', 'bottom'].includes(params.labelPosition as string)) {
             loadedConfig.labelPosition = params.labelPosition as 'top' | 'bottom';
@@ -191,6 +204,25 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
             }
           }
 
+          // Load themeConfig if available (handle both object and stringified JSON)
+          if (params.themeConfig) {
+            let themeConfig: any;
+            if (typeof params.themeConfig === 'string') {
+              try {
+                themeConfig = JSON.parse(params.themeConfig);
+              } catch (e) {
+                console.warn('Failed to parse themeConfig string:', e);
+                themeConfig = null;
+              }
+            } else if (typeof params.themeConfig === 'object') {
+              themeConfig = params.themeConfig;
+            }
+
+            if (themeConfig) {
+              loadedConfig.themeConfig = themeConfig;
+            }
+          }
+
           // Load actionConfig if available (handle both object and stringified JSON)
           if (params.actionConfig) {
             let actionConfig: any;
@@ -256,7 +288,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
         showCloseButton: config.showCloseButton ?? true,
         selectedTemplate: config.selectedTemplate || 'template-1',
         selectedClockStyle: config.selectedClockStyle || '1',
-        selectedTheme: config.selectedTheme || 'theme-1',
+        selectedTheme: config.selectedTheme || getFirstThemeId(),
         labelPosition: config.labelPosition || 'bottom',
         numberStyle: config.numberStyle || 'filled',
         backgroundColor: config.backgroundColor || '#f0f0f0',
@@ -275,6 +307,11 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
         };
         // Stringify for template rendering - Wix will render this as a string in the data attribute
         scriptParameters.timerConfig = JSON.stringify(timerConfigObj);
+      }
+
+      // Include themeConfig if it exists
+      if (config.themeConfig) {
+        scriptParameters.themeConfig = JSON.stringify(config.themeConfig);
       }
 
       // Include actionConfig if it exists
