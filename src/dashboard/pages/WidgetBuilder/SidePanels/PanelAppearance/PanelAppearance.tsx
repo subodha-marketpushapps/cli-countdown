@@ -153,6 +153,23 @@ const PanelAppearance: React.FC<Props> = ({
 
     const selectedClockConfig = getSelectedClockConfig();
 
+    // Helper function to get complete clock config with endDate and endTime
+    const getClockConfig = () => {
+        return {
+            ...selectedClockConfig,
+            endDate: config.timerMode === 'start-to-finish-timer' ? endDate : undefined,
+            endTime: config.timerMode === 'start-to-finish-timer' ? endTime : undefined,
+            timerMode: config.timerMode,
+            remainingTimePeriod: config.timerConfig?.remainingTimePeriod,
+            remainingTimePeriodUnit: config.timerConfig?.remainingTimePeriodUnit,
+            countFrom: config.timerConfig?.countPeriodStart ?? config.timerConfig?.countFrom,
+            countTo: config.timerConfig?.countTo,
+            countFrequency: config.timerConfig?.countFrequency,
+            countDirection: config.timerConfig?.countDirection || 'ascending',
+            displayOptions: config.timerConfig?.displayOptions,
+        };
+    };
+
     // Template layout definitions - each template has a different layout for Title, Subtitle, Timer, and Button positions
     const templateLayoutMap: Record<string, TemplateLayout> = {
         'template-1': 'title-subtitle-timer-button',  // Title/Subtitle | Timer | Button

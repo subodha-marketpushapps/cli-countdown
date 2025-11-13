@@ -260,7 +260,29 @@ const PanelTimer: React.FC<Props> = ({
               </SidePanel.Field>
             </SidePanel.Section>
 
-            <SidePanel.Section title={renderSectionTitle("Countdown Freequency", "Choose how often the counter should update.")}>
+            <SidePanel.Section title={renderSectionTitle("Count Direction", "Choose whether the counter counts up (ascending) or down (descending).")}>
+              <SidePanel.Field>
+                <FormField>
+                  <Dropdown
+                    size="small"
+                    selectedId={config.timerConfig?.countDirection || "ascending"}
+                    onSelect={(option) => onChange({
+                      ...config,
+                      timerConfig: { 
+                        ...config.timerConfig, 
+                        countDirection: option?.id as 'ascending' | 'descending' || 'ascending'
+                      }
+                    })}
+                    options={[
+                      { id: 'ascending', value: 'Ascending (Count Up)' },
+                      { id: 'descending', value: 'Descending (Count Down)' },
+                    ]}
+                  />
+                </FormField>
+              </SidePanel.Field>
+            </SidePanel.Section>
+
+            <SidePanel.Section title={renderSectionTitle("Countdown Frequency", "Choose how often the counter should update.")}>
               <SidePanel.Field>
                 <FormField>
                   <Box direction="vertical" gap="8px">

@@ -14,6 +14,7 @@ export interface TimerConfig {
     countPeriodStart?: number; // Alias for countFrom
     countTo?: number;
     countFrequency?: number; // Frequency in seconds
+    countDirection?: 'ascending' | 'descending'; // Count up or down
     displayOptions?: {
       showDays?: boolean;
       showHours?: boolean;

@@ -17,6 +17,7 @@ export interface ClockProps {
   countFrom?: number;
   countTo?: number;
   countFrequency?: number; // Frequency in seconds
+  countDirection?: 'ascending' | 'descending'; // Count up or down
   // Timer mode
   timerMode?: 'start-to-finish-timer' | 'personal-countdown' | 'number-counter';
   // Display options
@@ -48,6 +49,7 @@ const Clock: React.FC<ClockProps> = ({
   countFrom = 0,
   countTo = 100,
   countFrequency = 1,
+  countDirection = 'ascending',
   displayOptions,
 }) => {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
@@ -58,13 +60,6 @@ const Clock: React.FC<ClockProps> = ({
   });
 
   const [counterValue, setCounterValue] = useState<number>(countFrom);
-
-  // Initialize counter value when countFrom changes
-  useEffect(() => {
-    if (timerMode === 'number-counter') {
-      setCounterValue(countFrom);
-    }
-  }, [timerMode, countFrom]);
 
   // Start-to-finish timer mode
   useEffect(() => {
@@ -153,19 +148,36 @@ const Clock: React.FC<ClockProps> = ({
 
   // Number counter mode
   useEffect(() => {
-    if (timerMode !== 'number-counter') return;
+    if (timerMode !== 'number-counter') {
+      setCounterValue(countFrom);
+      return;
+    }
 
+    // Initialize counter value based on direction
+    const initialValue = countDirection === 'descending' ? countTo : countFrom;
+    setCounterValue(initialValue);
+
+    // Set up interval to increment or decrement counter
     const interval = setInterval(() => {
       setCounterValue((prev) => {
-        if (prev >= countTo) {
-          return countFrom; // Reset to start
+        if (countDirection === 'descending') {
+          // Count down
+          if (prev <= countFrom) {
+            return countTo; // Reset to end when reaching countFrom
+          }
+          return prev - 1;
+        } else {
+          // Count up (ascending)
+          if (prev >= countTo) {
+            return countFrom; // Reset to start when reaching countTo
+          }
+          return prev + 1;
         }
-        return prev + 1;
       });
-    }, countFrequency * 1000);
+    }, (countFrequency || 1) * 1000);
 
     return () => clearInterval(interval);
-  }, [timerMode, countFrom, countTo, countFrequency]);
+  }, [timerMode, countFrom, countTo, countFrequency, countDirection]);
 
   const formatNumber = (num: number): string => {
     return String(num).padStart(2, '0');
@@ -260,6 +272,9 @@ const Clock: React.FC<ClockProps> = ({
 
   // Render number counter mode
   if (timerMode === 'number-counter') {
+    // Format counter value - pad to at least 2 digits for consistency
+    const counterDisplay = counterValue.toString().padStart(2, '0');
+    
     return (
       <Box
         direction="horizontal"
@@ -270,7 +285,7 @@ const Clock: React.FC<ClockProps> = ({
           justifyContent: 'center',
         }}
       >
-        {renderDigit(formatNumber(counterValue), 'Count')}
+        {renderDigit(counterDisplay, 'Count')}
       </Box>
     );
   }

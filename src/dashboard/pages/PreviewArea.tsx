@@ -401,6 +401,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
                 countFrom: config.timerConfig?.countPeriodStart ?? config.timerConfig?.countFrom,
                 countTo: config.timerConfig?.countTo,
                 countFrequency: config.timerConfig?.countFrequency,
+                countDirection: config.timerConfig?.countDirection || 'ascending',
                 displayOptions: config.timerConfig?.displayOptions,
               }}
               layout={selectedLayout}

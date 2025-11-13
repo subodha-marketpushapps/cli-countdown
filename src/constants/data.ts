@@ -35,6 +35,7 @@ export const createDefaultTimerConfig = (): TimerConfig => {
       countPeriodStart: 0,
       countTo: 100,
       countFrequency: 1,
+      countDirection: 'ascending',
       displayOptions: {
         showDays: true,
         showHours: true,
