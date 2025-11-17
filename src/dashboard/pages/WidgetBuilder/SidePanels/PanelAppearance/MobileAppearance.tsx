@@ -87,8 +87,6 @@ const MobileAppearance: React.FC<MobileAppearanceProps> = ({
                                 <Box
                                 >
                                     <Box direction="vertical" gap="8px">
-                                        {/* <img src={verticalBackgroundImage} alt="Background" />
-                                     */}
                                         <Image src={horizontalBackgroundImage} />
 
                                         <Box direction="vertical" gap="8px" align="center">
