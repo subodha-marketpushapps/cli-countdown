@@ -217,8 +217,8 @@ const WidgetBuilderBackground: React.FC<WidgetBuilderBackgroundProps> = ({
       position="relative"
       overflow="hidden"
     >
-      {/* Website background iframe - render in both desktop and mobile views */}
-      {siteUrl && (
+      {/* Website background iframe - only render in desktop view */}
+      {siteUrl && viewType === "desktopView" && (
         <Box
           position="absolute"
           top={0}
@@ -246,30 +246,28 @@ const WidgetBuilderBackground: React.FC<WidgetBuilderBackgroundProps> = ({
           />
 
           {/* Soft inner shadows overlay - only in desktop view */}
-          {viewType === "desktopView" && (
-            <Box
-              position="absolute"
-              top={0}
-              left={0}
-              width="100%"
-              height="100%"
-              style={{
-                pointerEvents: "none",
-                opacity: isWebsiteBackgroundVisible ? 1 : 0,
-                transition: "opacity 0.3s ease-in-out",
-                boxShadow: `
-                  inset 0 0 60px rgba(0, 0, 0, 0.04),
-                  inset 0 0 120px rgba(0, 0, 0, 0.02),
-                  inset 0 0 200px rgba(0, 0, 0, 0.01),
-                  inset 0 4px 20px rgba(0, 0, 0, 0.03),
-                  inset 4px 0 20px rgba(0, 0, 0, 0.03),
-                  inset -4px 0 20px rgba(0, 0, 0, 0.03),
-                  inset 0 -4px 20px rgba(0, 0, 0, 0.03)
-                `,
-              }}
-              zIndex={2}
-            />
-          )}
+          <Box
+            position="absolute"
+            top={0}
+            left={0}
+            width="100%"
+            height="100%"
+            style={{
+              pointerEvents: "none",
+              opacity: isWebsiteBackgroundVisible ? 1 : 0,
+              transition: "opacity 0.3s ease-in-out",
+              boxShadow: `
+                inset 0 0 60px rgba(0, 0, 0, 0.04),
+                inset 0 0 120px rgba(0, 0, 0, 0.02),
+                inset 0 0 200px rgba(0, 0, 0, 0.01),
+                inset 0 4px 20px rgba(0, 0, 0, 0.03),
+                inset 4px 0 20px rgba(0, 0, 0, 0.03),
+                inset -4px 0 20px rgba(0, 0, 0, 0.03),
+                inset 0 -4px 20px rgba(0, 0, 0, 0.03)
+              `,
+            }}
+            zIndex={2}
+          />
         </Box>
       )}
 

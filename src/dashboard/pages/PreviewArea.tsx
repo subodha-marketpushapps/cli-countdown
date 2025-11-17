@@ -467,10 +467,11 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
                 width: '100%',
                 height: '100%',
                 position: 'relative',
-                padding: backgroundMode === 'website' ? '0' : (config.placement === 'centered_overlay' ? '0' : '20px'),
+                padding: viewType === 'mobileView' ? '32px 0px' : (backgroundMode === 'website' ? '0' : (config.placement === 'centered_overlay' ? '0' : '20px')),
                 minHeight: '100%',
                 overflow: config.placement === 'static_top' || config.placement === 'centered_overlay' ? 'visible' : 'hidden',
                 boxSizing: 'border-box',
+                backgroundColor: '#ffffff',
               }}
             >
               {renderContent()}
