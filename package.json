@@ -13,6 +13,7 @@
     "@wix/site-site": "^1.26.0",
     "@wix/wix-ui-icons-common": "^3.102.0",
     "axios": "^1.13.2",
+    "js-base64": "^3.7.8",
     "logrocket": "^10.1.0",
     "react-use-intercom": "^5.5.0",
     "recoil": "^0.7.7",
@@ -21,11 +22,12 @@
   "devDependencies": {
     "@types/react": "^16.0.0",
     "@types/react-dom": "^16.0.0",
-    "@wix/cli": "^1.1.133",
-    "@wix/cli-app": "^1.1.133",
+    "@wix/cli": "^1.1.143",
+    "@wix/cli-app": "^1.1.143",
     "@wix/sdk-types": "^1.14.0",
     "react": "16.14.0",
     "react-dom": "16.14.0",
+    "sass-embedded": "^1.93.3",
     "typescript": "~5.8.2"
   },
   "scripts": {

@@ -98,7 +98,7 @@ export const fullLoaderState = atom<boolean>({
 // To store the current navigation view (persists across hot reload)
 export const currentViewState = atom<"onboarding" | "overview" | "widget-builder">({
   key: "currentViewState",
-  default: "onboarding",
+  default: "overview",
 });
 
 // Export Intercom alignment state

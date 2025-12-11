@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { IconButton } from '@wix/design-system';
-import * as Icons from '@wix/wix-ui-icons-common';
+import React from 'react';
 import { TimerConfig } from './types';
 import CountDownTemplate, { TemplateLayout } from '../components/WidgetCountDown/CountDownTemplate';
 
@@ -19,7 +17,6 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
   viewType = 'desktopView',
   backgroundMode = 'website'
 }) => {
-  const [isOverlayClosed, setIsOverlayClosed] = useState(false);
 
   // Helper function to get startDate from config with fallback
   const getStartDate = (): Date => {
@@ -131,7 +128,14 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
   };
 
   const selectedClockConfig = getSelectedClockConfig();
-  const selectedLayout = templateLayoutMap[config.selectedTemplate || 'template-1'] || 'title-subtitle-timer-button';
+  
+  // Determine layout based on view type
+  // For mobile view, use mobileLayout config; for desktop, use selectedTemplate
+  const selectedLayout = viewType === 'mobileView' 
+    ? (config.mobileLayout === 'vertical' 
+        ? 'vertical-title-timer-button' 
+        : 'title-subtitle-timer-button')
+    : (templateLayoutMap[config.selectedTemplate || 'template-1'] || 'title-subtitle-timer-button');
 
   // Get positioning styles based on placement
   const getPlacementStyles = (): React.CSSProperties => {
@@ -227,30 +231,6 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
     transform: 'none',
   };
 
-  // For centered overlay, add a backdrop
-  const renderOverlayBackdrop = () => {
-    if (config.placement === 'centered_overlay' && !isOverlayClosed) {
-      return (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            zIndex: 10000,
-          }}
-        />
-      );
-    }
-    return null;
-  };
-
-  // Reset overlay closed state when placement changes
-  React.useEffect(() => {
-    setIsOverlayClosed(false);
-  }, [config.placement]);
 
   // Get container styles based on view type and background mode
   const getContainerStyles = (): React.CSSProperties => {
@@ -393,57 +373,6 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
     );
   };
 
-  // Don't render banner if overlay is closed
-  if (config.placement === 'centered_overlay' && isOverlayClosed) {
-    return (
-      <div
-        style={{
-          ...getContainerStyles(),
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        <div
-          style={getPreviewWrapperStyles()}
-        >
-          {viewType === 'mobileView' ? (
-            <PhoneFrame>
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'relative',
-                  padding: '32px 4px',
-                  minHeight: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <span style={{ color: '#6B7280', fontSize: '14px' }}>Overlay closed. Change placement to show preview.</span>
-              </div>
-            </PhoneFrame>
-          ) : (
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                position: 'relative',
-                padding: '20px',
-                minHeight: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span style={{ color: '#6B7280', fontSize: '14px' }}>Overlay closed. Change placement to show preview.</span>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       style={{
@@ -453,7 +382,6 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
         flex: 1,
       }}
     >
-      {renderOverlayBackdrop()}
       <div
         style={{
           ...getPreviewWrapperStyles(),
@@ -502,33 +430,6 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
       <>
         {/* Countdown Timer Preview */}
         <div key={config.placement} style={getPlacementStyles()}>
-          {/* Close button for centered overlay - positioned relative to the countdown timer */}
-          {config.placement === 'centered_overlay' && !isOverlayClosed && (
-            <IconButton
-              skin="dark"
-              priority="tertiary"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOverlayClosed(true);
-              }}
-              style={{
-                position: 'absolute',
-                top: '-8px',
-                right: '-8px',
-                zIndex: 10010,
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                borderRadius: '50%',
-                minWidth: '32px',
-                width: '32px',
-                height: '32px',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-              }}
-            >
-              <Icons.X />
-            </IconButton>
-          )}
           {/* Background image opacity overlay */}
           {themeConfig.backgroundImageUrl && themeConfig.imageOpacity && themeConfig.imageOpacity < 100 && (
             <div
@@ -540,7 +441,7 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
                 bottom: 0,
                 backgroundColor: themeConfig.imageOpacityColor || '#000000',
                 opacity: (100 - (themeConfig.imageOpacity || 100)) / 100,
-                borderRadius: config.placement === 'centered_overlay' ? '12px' : '0',
+                borderRadius: '0',
               }}
             />
           )}
@@ -584,6 +485,8 @@ const PreviewArea: React.FC<PreviewAreaProps> = ({
               buttonBackgroundOpacity={themeConfig.buttonBackgroundOpacity}
               buttonTextColor={themeConfig.buttonTextColor}
               buttonTextOpacity={themeConfig.buttonTextOpacity}
+              behaviorConfig={config.behaviorConfig}
+              mobileLayout={config.mobileLayout}
             />
           </div>
         </div>

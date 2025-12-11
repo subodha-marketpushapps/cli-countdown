@@ -1,6 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './countdown-styles.css';
 
+type BannerAnimation = 'slideIn' | 'fadeIn' | 'popIn' | 'bounce';
+type CounterAnimation = 'smoothIncrement' | 'popTransition' | 'flipClock' | 'fadeBetweenDigits';
+
+interface BehaviorConfig {
+  behaviorBannerAnimation?: BannerAnimation;
+  behaviorCounterNumberAnimation?: CounterAnimation;
+  frequency?: 'perSession' | 'everyXMinutes';
+  minutesInterval?: number;
+  targeting?: 'allPages' | 'specificPages';
+  specificPages?: string[];
+  allowManualClose?: boolean;
+}
+
 interface TimerConfig {
   targetDate: string;
   format: 'full' | 'compact' | 'minimal';
@@ -9,6 +22,8 @@ interface TimerConfig {
   placement: 'top' | 'center' | 'bottom';
   title: string;
   message: string;
+  containerId?: string;
+  behaviorConfig?: BehaviorConfig;
 }
 
 interface TimeRemaining {
@@ -25,9 +40,92 @@ interface CountdownTimerProps {
 const CountdownTimer: React.FC<CountdownTimerProps> = ({ config }) => {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(null);
   const [isExpired, setIsExpired] = useState(false);
-  const [isClosed, setIsClosed] = useState(false);
-  const overlayRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [shouldDisplay, setShouldDisplay] = useState(true);
+  const [isManuallyClosed, setIsManuallyClosed] = useState(false);
+
+  const behaviorConfig = config.behaviorConfig || {};
+  const allowManualClose = behaviorConfig.allowManualClose !== false;
+  const numberAnimationClass = behaviorConfig.behaviorCounterNumberAnimation
+    ? `countdown-number-anim-${behaviorConfig.behaviorCounterNumberAnimation}`
+    : '';
+  const bannerAnimationClass = behaviorConfig.behaviorBannerAnimation
+    ? `countdown-banner-anim-${behaviorConfig.behaviorBannerAnimation}`
+    : 'countdown-banner-anim-slideIn';
+  const behaviorConfigKey = JSON.stringify(behaviorConfig || {});
+  const sessionKey = `${config.containerId || 'wix-countdown-timer'}-session-shown`;
+  const lastClosedKey = `${config.containerId || 'wix-countdown-timer'}-last-closed`;
+
+  const passesTargetingRules = (): boolean => {
+    if (!behaviorConfig || behaviorConfig.targeting !== 'specificPages') {
+      return true;
+    }
+
+    const pages = behaviorConfig.specificPages || [];
+    if (!pages.length) {
+      return false;
+    }
+
+    if (typeof window === 'undefined') {
+      return true;
+    }
+
+    const normalizePath = (path: string) => {
+      if (!path) {
+        return '/';
+      }
+      const trimmed = path.trim();
+      return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+    };
+
+    const currentPath = (window.location?.pathname || '/').toLowerCase();
+    return pages.some((page) => currentPath.startsWith(normalizePath(page).toLowerCase()));
+  };
+
+  const passesFrequencyRules = (): boolean => {
+    try {
+      if (behaviorConfig.frequency === 'perSession') {
+        if (typeof sessionStorage === 'undefined') {
+          return true;
+        }
+        return sessionStorage.getItem(sessionKey) !== 'true';
+      }
+
+      if (behaviorConfig.frequency === 'everyXMinutes') {
+        if (typeof localStorage === 'undefined') {
+          return true;
+        }
+        const lastClosed = localStorage.getItem(lastClosedKey);
+        if (!lastClosed) {
+          return true;
+        }
+        const intervalMinutes = Math.max(behaviorConfig.minutesInterval || 2, 1);
+        const diff = Date.now() - Number(lastClosed);
+        return diff >= intervalMinutes * 60 * 1000;
+      }
+    } catch (error) {
+      console.warn('Could not evaluate frequency rules:', error);
+      return true;
+    }
+
+    return true;
+  };
+
+  useEffect(() => {
+    const canDisplay = passesTargetingRules() && passesFrequencyRules();
+    setShouldDisplay(canDisplay);
+    setIsManuallyClosed(false);
+
+    if (canDisplay && behaviorConfig.frequency === 'perSession') {
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem(sessionKey, 'true');
+        }
+      } catch (error) {
+        console.warn('Could not persist session state:', error);
+      }
+    }
+  }, [behaviorConfigKey, config.targetDate, sessionKey, lastClosedKey]);
 
   const calculateTimeRemaining = (): TimeRemaining | null => {
     const target = new Date(config.targetDate).getTime();
@@ -45,13 +143,6 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config }) => {
       seconds: Math.floor((difference % (1000 * 60)) / 1000),
     };
   };
-
-  useEffect(() => {
-    // Check if overlay was closed in session storage
-    if (config.placement === 'center' && sessionStorage.getItem('countdown-timer-closed') === 'true') {
-      setIsClosed(true);
-    }
-  }, [config.placement]);
 
   useEffect(() => {
     const updateTimer = () => {
@@ -75,14 +166,13 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config }) => {
     return String(num).padStart(2, '0');
   };
 
-  const closeOverlay = () => {
-    setIsClosed(true);
-    sessionStorage.setItem('countdown-timer-closed', 'true');
-  };
-
   const getSizeClass = (): string => {
     return `countdown-size-${config.size}`;
   };
+
+  if (!shouldDisplay || isManuallyClosed) {
+    return null;
+  }
 
   if (!timeRemaining && !isExpired) {
     return (
@@ -96,7 +186,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config }) => {
     return (
       <div className={`countdown-timer expired ${getSizeClass()}`}>
         {config.title && <h3 className="countdown-title">{config.title}</h3>}
-        <div className="countdown-expired">Countdown Expired!</div>
+        {/* <div className="countdown-expired">Countdown Expired!</div> */}
       </div>
     );
   }
@@ -109,7 +199,10 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config }) => {
     if (config.format === 'minimal') {
       return (
         <div className="countdown-minimal">
-          {timeRemaining.days}d {timeRemaining.hours}h {timeRemaining.minutes}m {timeRemaining.seconds}s
+          <span className={`countdown-number ${numberAnimationClass}`}>{timeRemaining.days}d</span>{' '}
+          <span className={`countdown-number ${numberAnimationClass}`}>{timeRemaining.hours}h</span>{' '}
+          <span className={`countdown-number ${numberAnimationClass}`}>{timeRemaining.minutes}m</span>{' '}
+          <span className={`countdown-number ${numberAnimationClass}`}>{timeRemaining.seconds}s</span>
         </div>
       );
     }
@@ -118,22 +211,22 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config }) => {
       return (
         <div className="countdown-compact">
           <div className="countdown-unit">
-            <span className="countdown-number">{formatNumber(timeRemaining.days)}</span>
+            <span className={`countdown-number ${numberAnimationClass}`}>{formatNumber(timeRemaining.days)}</span>
             {config.showLabels && <span className="countdown-label">Days</span>}
           </div>
           <span className="countdown-separator">:</span>
           <div className="countdown-unit">
-            <span className="countdown-number">{formatNumber(timeRemaining.hours)}</span>
+            <span className={`countdown-number ${numberAnimationClass}`}>{formatNumber(timeRemaining.hours)}</span>
             {config.showLabels && <span className="countdown-label">Hours</span>}
           </div>
           <span className="countdown-separator">:</span>
           <div className="countdown-unit">
-            <span className="countdown-number">{formatNumber(timeRemaining.minutes)}</span>
+            <span className={`countdown-number ${numberAnimationClass}`}>{formatNumber(timeRemaining.minutes)}</span>
             {config.showLabels && <span className="countdown-label">Minutes</span>}
           </div>
           <span className="countdown-separator">:</span>
           <div className="countdown-unit">
-            <span className="countdown-number">{formatNumber(timeRemaining.seconds)}</span>
+            <span className={`countdown-number ${numberAnimationClass}`}>{formatNumber(timeRemaining.seconds)}</span>
             {config.showLabels && <span className="countdown-label">Seconds</span>}
           </div>
         </div>
@@ -144,63 +237,64 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config }) => {
     return (
       <div className="countdown-full">
         <div className="countdown-box">
-          <span className="countdown-number">{formatNumber(timeRemaining.days)}</span>
+          <span className={`countdown-number ${numberAnimationClass}`}>{formatNumber(timeRemaining.days)}</span>
           {config.showLabels && <span className="countdown-label">Days</span>}
         </div>
         <div className="countdown-box">
-          <span className="countdown-number">{formatNumber(timeRemaining.hours)}</span>
+          <span className={`countdown-number ${numberAnimationClass}`}>{formatNumber(timeRemaining.hours)}</span>
           {config.showLabels && <span className="countdown-label">Hours</span>}
         </div>
         <div className="countdown-box">
-          <span className="countdown-number">{formatNumber(timeRemaining.minutes)}</span>
+          <span className={`countdown-number ${numberAnimationClass}`}>{formatNumber(timeRemaining.minutes)}</span>
           {config.showLabels && <span className="countdown-label">Minutes</span>}
         </div>
         <div className="countdown-box">
-          <span className="countdown-number">{formatNumber(timeRemaining.seconds)}</span>
+          <span className={`countdown-number ${numberAnimationClass}`}>{formatNumber(timeRemaining.seconds)}</span>
           {config.showLabels && <span className="countdown-label">Seconds</span>}
         </div>
       </div>
     );
   };
 
-  const timerContent = (
-    <div className={`countdown-timer ${getSizeClass()}`}>
-      {config.title && <h3 className="countdown-title">{config.title}</h3>}
-      {config.message && <p className="countdown-message">{config.message}</p>}
-      <div className={`countdown-display countdown-${config.format}`}>
-        {renderTimerContent()}
-      </div>
-    </div>
-  );
+  const handleManualClose = () => {
+    if (!allowManualClose) {
+      return;
+    }
+    setIsManuallyClosed(true);
 
-  // Handle placement
-  if (config.placement === 'center' && !isClosed) {
-    return (
-      <div className="countdown-overlay" ref={overlayRef} onClick={(e) => {
-        if (e.target === overlayRef.current) {
-          closeOverlay();
-        }
-      }}>
-        <div className="countdown-timer-wrapper">
-          <button
-            className="countdown-close-button"
-            onClick={closeOverlay}
-            aria-label="Close countdown timer"
-          >
-            ×
-          </button>
-          {timerContent}
-        </div>
-      </div>
-    );
-  }
+    try {
+      if (behaviorConfig.frequency === 'perSession' && typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(sessionKey, 'true');
+      }
+      if (behaviorConfig.frequency === 'everyXMinutes' && typeof localStorage !== 'undefined') {
+        localStorage.setItem(lastClosedKey, Date.now().toString());
+      }
+    } catch (error) {
+      console.warn('Could not persist dismissal state:', error);
+    }
+  };
 
   return (
     <div
       ref={containerRef}
-      className={`countdown-container countdown-${config.placement}`}
+      className={`countdown-container countdown-${config.placement} ${bannerAnimationClass}`}
     >
-      {timerContent}
+      {allowManualClose && (
+        <button
+          className="countdown-close-button"
+          onClick={handleManualClose}
+          aria-label="Close countdown timer"
+        >
+          ×
+        </button>
+      )}
+      <div className={`countdown-timer ${getSizeClass()}`}>
+        {config.title && <h3 className="countdown-title">{config.title}</h3>}
+        {config.message && <p className="countdown-message">{config.message}</p>}
+        <div className={`countdown-display countdown-${config.format}`}>
+          {renderTimerContent()}
+        </div>
+      </div>
     </div>
   );
 };

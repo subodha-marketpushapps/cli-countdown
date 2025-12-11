@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, FormField, SidePanel, Input, Box, Text, ToggleSwitch, Image, Tabs } from "@wix/design-system";
 import { Edit as EditIcon } from "@wix/wix-ui-icons-common";
 import { TimerConfig } from "../../../types";
@@ -37,6 +37,8 @@ interface Props {
     onChange: (config: TimerConfig) => void;
     onCloseButtonClick: () => void;
     previewControl?: any; // Preview control from parent
+    currentViewType?: 'desktopView' | 'mobileView';
+    onViewModeChange?: (viewType: 'desktopView' | 'mobileView') => void;
 }
 
 const PanelAppearance: React.FC<Props> = ({
@@ -44,9 +46,25 @@ const PanelAppearance: React.FC<Props> = ({
     onChange,
     onCloseButtonClick,
     previewControl,
+    currentViewType = 'desktopView',
+    onViewModeChange,
 }) => {
     const [showCustomizeTheme, setShowCustomizeTheme] = useState(false);
-    const [activeTab, setActiveTab] = useState(0);
+    const [activeTab, setActiveTab] = useState(currentViewType === 'mobileView' ? 1 : 0);
+
+    useEffect(() => {
+        setActiveTab(currentViewType === 'mobileView' ? 1 : 0);
+    }, [currentViewType]);
+
+    const handleTabClick = (value: { id: number }) => {
+        const newTab = Number(value.id);
+        setActiveTab(newTab);
+        if (newTab === 0) {
+            onViewModeChange?.('desktopView');
+        } else {
+            onViewModeChange?.('mobileView');
+        }
+    };
 
     // Helper function to get startDate from config with fallback
     const getStartDate = (): Date => {
@@ -699,7 +717,7 @@ const PanelAppearance: React.FC<Props> = ({
                     activeId={activeTab}
                     type="uniformSide"
                     width="114px"
-                    onClick={(value) => setActiveTab(Number(value.id))}
+                    onClick={handleTabClick}
                 />
             </SidePanel.Header>
 

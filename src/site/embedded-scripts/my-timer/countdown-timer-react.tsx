@@ -2,6 +2,19 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import CountdownTimer from './CountdownTimer';
 
+type BannerAnimation = 'slideIn' | 'fadeIn' | 'popIn' | 'bounce';
+type CounterAnimation = 'smoothIncrement' | 'popTransition' | 'flipClock' | 'fadeBetweenDigits';
+
+interface BehaviorConfig {
+  behaviorBannerAnimation?: BannerAnimation;
+  behaviorCounterNumberAnimation?: CounterAnimation;
+  frequency?: 'perSession' | 'everyXMinutes';
+  minutesInterval?: number;
+  targeting?: 'allPages' | 'specificPages';
+  specificPages?: string[];
+  allowManualClose?: boolean;
+}
+
 interface TimerConfig {
   targetDate: string;
   format: 'full' | 'compact' | 'minimal';
@@ -11,6 +24,7 @@ interface TimerConfig {
   title: string;
   message: string;
   containerId: string;
+  behaviorConfig?: BehaviorConfig;
 }
 
 // Storage key for saved settings
@@ -48,6 +62,16 @@ function getConfigFromAttributes(container: HTMLElement): TimerConfig | null {
     return null;
   }
 
+  let behaviorConfig: BehaviorConfig | undefined;
+  const behaviorAttr = container.getAttribute('data-behavior-config');
+  if (behaviorAttr) {
+    try {
+      behaviorConfig = JSON.parse(behaviorAttr);
+    } catch (error) {
+      console.warn('Could not parse behavior config:', error);
+    }
+  }
+
   return {
     targetDate: targetDate,
     format: (container.getAttribute('data-format') as 'full' | 'compact' | 'minimal') || 'full',
@@ -57,6 +81,7 @@ function getConfigFromAttributes(container: HTMLElement): TimerConfig | null {
     title: container.getAttribute('data-title') || 'Countdown Timer',
     message: container.getAttribute('data-message') || '',
     containerId: 'wix-countdown-timer',
+    behaviorConfig,
   };
 }
 
@@ -82,6 +107,9 @@ function getConfig(container: HTMLElement): TimerConfig | null {
     container.setAttribute('data-placement', savedConfig.placement);
     container.setAttribute('data-title', savedConfig.title);
     container.setAttribute('data-message', savedConfig.message);
+    if (savedConfig.behaviorConfig) {
+      container.setAttribute('data-behavior-config', JSON.stringify(savedConfig.behaviorConfig));
+    }
     return savedConfig;
   }
   
@@ -172,6 +200,7 @@ function setupAttributeObserver(): void {
       'data-placement',
       'data-title',
       'data-message',
+      'data-behavior-config',
     ],
   });
 

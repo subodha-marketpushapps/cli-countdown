@@ -8,6 +8,8 @@
   justify-content: space-between;
   gap: 16px;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 }
 
 .countdown-template-text {
@@ -74,5 +76,84 @@
 
 .countdown-template-clock {
   flex-shrink: 0;
+}
+
+.countdown-template-close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.08);
+  color: #162d3d;
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.countdown-template-close-button:hover {
+  background: rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.countdown-template-close-button:active {
+  transform: scale(0.95);
+}
+
+.countdown-template-closed {
+  border: 1px dashed #d3d7de;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  background: #fafbff;
+}
+
+.banner-anim-slideIn {
+  animation: countdownBannerSlideIn 0.6s ease forwards;
+}
+
+.banner-anim-fadeIn {
+  animation: countdownBannerFadeIn 0.6s ease forwards;
+}
+
+.banner-anim-popIn {
+  animation: countdownBannerPopIn 0.6s ease forwards;
+}
+
+.banner-anim-bounce {
+  animation: countdownBannerBounce 0.8s ease forwards;
+}
+
+@keyframes countdownBannerSlideIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes countdownBannerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes countdownBannerPopIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  60% { opacity: 1; transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes countdownBannerBounce {
+  0% { transform: translateY(-20px); opacity: 0; }
+  50% { transform: translateY(5px); opacity: 1; }
+  100% { transform: translateY(0); }
 }
 

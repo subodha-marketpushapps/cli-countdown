@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Box, Text, Button } from '@wix/design-system';
 import Clock, { ClockProps } from './Clock';
 import './CountDownTemplate.css';
+import { TimerConfig } from '../../pages/types';
 
 export type TemplateLayout = 
   | 'title-timer-button'      // Title | Timer | Button (horizontal)
@@ -33,6 +34,8 @@ export interface CountdownBannerProps {
   buttonBackgroundOpacity?: number;
   buttonTextColor?: string;
   buttonTextOpacity?: number;
+  mobileLayout?: 'vertical' | 'horizontal';
+  behaviorConfig?: TimerConfig['behaviorConfig'];
 }
 
 const CountDownTemplate: React.FC<CountdownBannerProps> = ({
@@ -56,12 +59,22 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
   buttonBackgroundOpacity,
   buttonTextColor,
   buttonTextOpacity,
-  
+  mobileLayout = 'horizontal',
+  behaviorConfig,
 }) => {
   const isVertical = layout === 'vertical-title-timer-button';
+  const allowManualClose = behaviorConfig?.allowManualClose !== false;
+  const [isClosed, setIsClosed] = useState(false);
+  const bannerAnimationClass = behaviorConfig?.behaviorBannerAnimation
+    ? `banner-anim-${behaviorConfig.behaviorBannerAnimation}`
+    : 'banner-anim-slideIn';
   
   // Track window width for responsive font sizing
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1920);
+
+  useEffect(() => {
+    setIsClosed(false);
+  }, [behaviorConfig, title, subTitle, buttonText, buttonLink, layout, mobileLayout]);
   
   useEffect(() => {
     // Set initial width
@@ -132,14 +145,10 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
 
   const textContainerStyle: React.CSSProperties = {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: mobileLayout === 'vertical' ? 'column' : 'row',
     gap: `${8 * scale}px`,
     minWidth: 0,
     justifyContent: 'space-between',
-  };
-
-  const numberContainerStyle: React.CSSProperties = {
-    backgroundColor: clockConfig.backgroundColor,
   };
 
   // Helper function to apply opacity to color
@@ -189,6 +198,7 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
     ...clockConfig,
     backgroundColor: finalCountdownBgColor,
     textColor: finalCountdownTextColor,
+    numberAnimation: behaviorConfig?.behaviorCounterNumberAnimation,
   };
 
   // Render based on layout
@@ -302,8 +312,30 @@ const CountDownTemplate: React.FC<CountdownBannerProps> = ({
     }
   };
 
+  if (isClosed) {
+    return (
+      <Box className="countdown-template-closed">
+        <Text weight="bold">Banner closed in preview</Text>
+        <Text secondary size="small">Toggle “Allow manual close” off to disable the close button.</Text>
+        <Button size="small" onClick={() => setIsClosed(false)}>Reopen preview</Button>
+      </Box>
+    );
+  }
+
   return (
-    <Box style={containerStyle}>
+    <Box
+      style={containerStyle}
+      className={`countdown-template-container ${bannerAnimationClass}`}
+    >
+      {allowManualClose && (
+        <button
+          className="countdown-template-close-button"
+          onClick={() => setIsClosed(true)}
+          aria-label="Close countdown preview"
+        >
+          ×
+        </button>
+      )}
       {renderContent()}
     </Box>
   );

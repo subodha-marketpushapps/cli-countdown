@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Box, Text } from '@wix/design-system';
 import './Clock.css';
+import { BehaviorCounterNumberAnimation } from '../../pages/types';
 
 // Helper function to get responsive font size based on window width
 // This will be called with windowWidth parameter from component state
@@ -32,6 +33,7 @@ export interface ClockProps {
   numberStyle: 'fillEachDigit' | 'outlineEachDigit' | 'filled' | 'outline' | 'none';
   backgroundColor: string;
   textColor: string;
+  numberAnimation?: BehaviorCounterNumberAnimation;
   // Start-to-finish timer mode
   startDate?: Date;
   startTime?: string; // Format: "HH:mm:ss"
@@ -66,6 +68,7 @@ interface TimeRemaining {
 const Clock: React.FC<ClockProps> = ({
   labelPosition,
   numberStyle,
+  numberAnimation,
   startDate,
   startTime,
   endDate,
@@ -364,14 +367,16 @@ const Clock: React.FC<ClockProps> = ({
       margin: '0 4px',
     };
 
+    const animationClass = numberAnimation ? `digit-anim-${numberAnimation}` : '';
+
     return (
-      <Box style={digitBoxStyle}>
+      <Box style={digitBoxStyle} className={`clock-digit ${animationClass}`}>
         {labelPosition === 'top' && (
           <span style={{ ...labelStyle, fontSize: `${labelFontSize}px`, color: numberStyleMap[numberStyle].backgroundColor }}>
             {label}
           </span>
         )}
-        <Box style={numberStyleMap[numberStyle]}>
+        <Box style={numberStyleMap[numberStyle]} className={`clock-digit-value ${animationClass}`}>
           <span style={{ color: numberStyleMap[numberStyle].color, fontSize: `${numberFontSize}px`, fontWeight: 'bold' }}>
             {value}
           </span>

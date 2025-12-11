@@ -17,7 +17,7 @@ import {
   MarketingPageLayoutContent,
   TestimonialList,
 } from "@wix/design-system";
-import ImageAIProductImages from '../../../../assets/images/image_marketing-ai-product-images.png';
+// import ImageAIProductImages from '../../../../assets/images/image_marketing-ai-product-images.png';
 import MarketingCard from './MarketingCard';
 import appListData from './appListData.json';
 
@@ -79,7 +79,7 @@ const MarketingSection: React.FC = () => {
               />
             </Box>
           }
-          image={<Box style={{ transform: 'translateY(49px)' }}><Image src={ImageAIProductImages} transparent borderRadius={0} /></Box>}
+          image={<Box style={{ transform: 'translateY(49px)' }}><Image transparent borderRadius={0} /></Box>}
         />
       </Card>
 

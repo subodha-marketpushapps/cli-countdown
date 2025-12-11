@@ -19,9 +19,74 @@ import PreviewArea from '../PreviewArea';
 import { TimerConfig } from '../types';
 import { createDefaultTimerConfig } from '../../../constants';
 import { getFirstThemeId, getFirstThemeConfig } from './SidePanels/PanelAppearance/themeUtils';
+import { objectToBase64 } from '../../utils/base64-utils';
 
 // Component ID from embedded.json
 const EMBEDDED_SCRIPT_COMPONENT_ID = '3a1cc044-7e31-4f0c-aefb-1113d572f101';
+
+const toDate = (value?: Date | string | null): Date | undefined => {
+  if (!value) {
+    return undefined;
+  }
+
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? undefined : value;
+  }
+
+  const parsed = new Date(value);
+  return isNaN(parsed.getTime()) ? undefined : parsed;
+};
+
+const combineDateAndTime = (date?: Date | string | null, time?: Date | string | null): Date | undefined => {
+  const baseDate = toDate(date);
+  if (!baseDate) {
+    return undefined;
+  }
+
+  if (time) {
+    const timeDate = toDate(time);
+    if (timeDate) {
+      baseDate.setHours(
+        timeDate.getHours(),
+        timeDate.getMinutes(),
+        timeDate.getSeconds(),
+        timeDate.getMilliseconds()
+      );
+      return baseDate;
+    }
+  }
+
+  // Default to end of day if no time is provided
+  baseDate.setHours(23, 59, 59, 0);
+  return baseDate;
+};
+
+const computeTargetDateISO = (config: TimerConfig): string | undefined => {
+  const timerCfg = config.timerConfig;
+  if (!timerCfg) {
+    return undefined;
+  }
+
+  switch (config.timerMode) {
+    case 'start-to-finish-timer': {
+      const endDate = combineDateAndTime(timerCfg.endDate, timerCfg.endTime);
+      return endDate?.toISOString();
+    }
+    case 'personal-countdown': {
+      const amount = timerCfg.remainingTimePeriod ?? 0;
+      const unit = timerCfg.remainingTimePeriodUnit ?? 'minutes';
+      const unitToMs: Record<'minutes' | 'hours' | 'days', number> = {
+        minutes: 60 * 1000,
+        hours: 60 * 60 * 1000,
+        days: 24 * 60 * 60 * 1000,
+      };
+      const duration = amount * (unitToMs[unit] || unitToMs.minutes);
+      return new Date(Date.now() + duration).toISOString();
+    }
+    default:
+      return undefined;
+  }
+};
 
 interface WidgetBuilderProps {
   onBackClicked?: () => void;
@@ -70,29 +135,41 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
           }
 
           // Load timer config if available
-          if (params.timerConfig && typeof params.timerConfig === 'object') {
-            const timerConfig = params.timerConfig as any;
-            loadedConfig.timerConfig = {
-              startDate: timerConfig.startDate ? new Date(timerConfig.startDate) : undefined,
-              endDate: timerConfig.endDate ? new Date(timerConfig.endDate) : undefined,
-              startTime: timerConfig.startTime ? new Date(timerConfig.startTime) : (() => {
-                const date = new Date();
-                date.setHours(0, 0, 0, 0);
-                return date;
-              })(),
-              endTime: timerConfig.endTime ? new Date(timerConfig.endTime) : (() => {
-                const date = new Date();
-                date.setHours(23, 59, 59, 0);
-                return date;
-              })(),
-              timeZone: timerConfig.timeZone || 'UTC',
-              displayOptions: timerConfig.displayOptions || {
-                showDays: true,
-                showHours: true,
-                showMinutes: true,
-                showSeconds: true,
-              },
-            };
+          if (params.timerConfig) {
+            let timerConfigData: any = null;
+            if (typeof params.timerConfig === 'string') {
+              try {
+                timerConfigData = JSON.parse(params.timerConfig);
+              } catch (error) {
+                console.warn('Failed to parse timerConfig string:', error);
+              }
+            } else if (typeof params.timerConfig === 'object') {
+              timerConfigData = params.timerConfig;
+            }
+
+            if (timerConfigData) {
+              loadedConfig.timerConfig = {
+                startDate: timerConfigData.startDate ? new Date(timerConfigData.startDate) : undefined,
+                endDate: timerConfigData.endDate ? new Date(timerConfigData.endDate) : undefined,
+                startTime: timerConfigData.startTime ? new Date(timerConfigData.startTime) : (() => {
+                  const date = new Date();
+                  date.setHours(0, 0, 0, 0);
+                  return date;
+                })(),
+                endTime: timerConfigData.endTime ? new Date(timerConfigData.endTime) : (() => {
+                  const date = new Date();
+                  date.setHours(23, 59, 59, 0);
+                  return date;
+                })(),
+                timeZone: timerConfigData.timeZone || 'UTC',
+                displayOptions: timerConfigData.displayOptions || {
+                  showDays: true,
+                  showHours: true,
+                  showMinutes: true,
+                  showSeconds: true,
+                },
+              };
+            }
           }
 
           // Legacy support: if targetDate exists but no timerConfig.endDate, use targetDate as endDate
@@ -147,6 +224,25 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
           }
           if (params.textColor) {
             loadedConfig.textColor = params.textColor as string;
+          }
+
+          // Load behaviorConfig if available (handle both object and stringified JSON)
+          if (params.behaviorConfig) {
+            let behaviorConfig: any;
+            if (typeof params.behaviorConfig === 'string') {
+              try {
+                behaviorConfig = JSON.parse(params.behaviorConfig);
+              } catch (e) {
+                console.warn('Failed to parse behaviorConfig string:', e);
+                behaviorConfig = null;
+              }
+            } else if (typeof params.behaviorConfig === 'object') {
+              behaviorConfig = params.behaviorConfig;
+            }
+
+            if (behaviorConfig) {
+              loadedConfig.behaviorConfig = behaviorConfig;
+            }
           }
 
           // Load placement
@@ -299,28 +395,42 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
         textColor: config.textColor || '#000000',
       };
 
+      const targetDateISO = computeTargetDateISO(config);
+      if (targetDateISO) {
+        scriptParameters.targetDate = targetDateISO;
+      }
+
       // Include timerConfig if it exists (stringify it for template rendering)
       if (config.timerConfig) {
+        const startDate = toDate(config.timerConfig.startDate);
+        const endDate = toDate(config.timerConfig.endDate);
+        const startTime = toDate(config.timerConfig.startTime);
+        const endTime = toDate(config.timerConfig.endTime);
+
         const timerConfigObj = {
-          startDate: config.timerConfig.startDate ? config.timerConfig.startDate.toISOString() : undefined,
-          endDate: config.timerConfig.endDate ? config.timerConfig.endDate.toISOString() : undefined,
-          startTime: config.timerConfig.startTime ? config.timerConfig.startTime.toISOString() : undefined,
-          endTime: config.timerConfig.endTime ? config.timerConfig.endTime.toISOString() : undefined,
+          startDate: startDate ? startDate.toISOString() : undefined,
+          endDate: endDate ? endDate.toISOString() : undefined,
+          startTime: startTime ? startTime.toISOString() : undefined,
+          endTime: endTime ? endTime.toISOString() : undefined,
           timeZone: config.timerConfig.timeZone,
           displayOptions: config.timerConfig.displayOptions,
         };
         // Stringify for template rendering - Wix will render this as a string in the data attribute
-        scriptParameters.timerConfig = JSON.stringify(timerConfigObj);
+        scriptParameters.timerConfig = timerConfigObj;
       }
 
       // Include themeConfig if it exists
       if (config.themeConfig) {
-        scriptParameters.themeConfig = JSON.stringify(config.themeConfig);
+        scriptParameters.themeConfig = config.themeConfig;
       }
 
       // Include actionConfig if it exists
       if (config.actionConfig) {
-        scriptParameters.actionConfig = JSON.stringify(config.actionConfig);
+        scriptParameters.actionConfig = config.actionConfig;
+      }
+
+      if (config.behaviorConfig) {
+        scriptParameters.behaviorConfig = config.behaviorConfig;
       }
 
       // Check if script is already embedded
@@ -335,15 +445,26 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
         isAlreadyEmbedded = false;
       }
 
+      console.log('scriptParameters', objectToBase64(scriptParameters));
       // Embed or update the script
+
+      const scriptParameters = {
+        widgetState: objectToBase64(scriptParameters),
+        draftWidgetState: objectToBase64(scriptParameters),
+        timestamp: (new Date()).getTime().toString(),
+        version: '1.0.0',
+        lastModified: (new Date()).getTime().toString(),
+        hasUnsavedChanges: "false"
+      }
       await embeddedScripts.embedScript(
         {
-          parameters: scriptParameters,
-          disabled: false,
+          // parameters: scriptParameters,
+          // disabled: false,
+          parameters: scriptParameters
         },
-        {
-          componentId: EMBEDDED_SCRIPT_COMPONENT_ID,
-        }
+        // {
+        //   componentId: EMBEDDED_SCRIPT_COMPONENT_ID,
+        // }
       );
 
       dashboard.showToast({
@@ -354,15 +475,15 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
       });
     } catch (error: any) {
       console.error('Error embedding script:', error);
-      
+
       let errorMessage = 'Failed to embed countdown timer.';
-      
+
       if (error?.status === 403 || error?.statusCode === 403 || error?.response?.status === 403) {
         errorMessage = 'Permission denied (403). The app needs APPS.MANAGE_EMBEDDED_SCRIPT permission.';
       } else if (error?.message) {
         errorMessage = `Error: ${error.message}`;
       }
-      
+
       dashboard.showToast({
         message: errorMessage,
         type: 'error',
@@ -444,6 +565,8 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
                       config={config}
                       onChange={handleConfigChange}
                       onCloseButtonClick={() => setSelectedSidebar(-1)}
+                      currentViewType={viewType}
+                      onViewModeChange={setViewType}
                     />
                   )}
                   {selectedSidebar === 3 && (
@@ -464,9 +587,9 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
               </SidePanelContainer>
 
               {/* Preview Area */}
-              <Box 
-                flex="1" 
-                style={{ 
+              <Box
+                flex="1"
+                style={{
                   marginLeft: selectedSidebar !== -1 ? '16px' : '0',
                   transition: 'margin-left 0.2s ease',
                 }}
@@ -476,25 +599,25 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBackClicked }) => {
                   backgroundMode={backgroundMode}
                   viewType={viewType}
                 >
-                <Box 
-                  flex="1" 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    minWidth: 0,
-                    position: 'relative',
-                    padding: backgroundMode === 'website' ? '0' : '16px',
-                  }}
-                >
-                  <PreviewArea
-                    config={config}
-                    endDate={config.timerConfig?.endDate}
-                    endTime={config.timerConfig?.endTime}
-                    viewType={viewType}
-                    backgroundMode={backgroundMode}
-                  />
-                </Box>
-              </WidgetBuilderBackground>
+                  <Box
+                    flex="1"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      minWidth: 0,
+                      position: 'relative',
+                      padding: backgroundMode === 'website' ? '0' : '16px',
+                    }}
+                  >
+                    <PreviewArea
+                      config={config}
+                      endDate={config.timerConfig?.endDate}
+                      endTime={config.timerConfig?.endTime}
+                      viewType={viewType}
+                      backgroundMode={backgroundMode}
+                    />
+                  </Box>
+                </WidgetBuilderBackground>
               </Box>
             </Box>
           )}

@@ -89,9 +89,9 @@ const CountDownTimer: FC<CountDownTimerProps> = ({
   if (isExpired) {
     return (
       <Box align="center" verticalAlign="middle" padding="SP6">
-        <Text weight="bold" size="medium">
+        {/* <Text weight="bold" size="medium">
           Countdown Expired!
-        </Text>
+        </Text> */}
       </Box>
     );
   }

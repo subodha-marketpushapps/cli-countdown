@@ -20,8 +20,6 @@ class CountdownTimer {
   private config: TimerConfig;
   private intervalId: number | null = null;
   private container: HTMLElement | null = null;
-  private overlay: HTMLElement | null = null;
-  private isClosed: boolean = false;
 
   constructor(config: TimerConfig) {
     this.config = config;
@@ -48,68 +46,10 @@ class CountdownTimer {
 
     if (this.config.placement === 'center') {
       this.container.classList.add('countdown-center');
-      this.createOverlay();
     } else if (this.config.placement === 'top') {
       this.container.classList.add('countdown-top');
     } else if (this.config.placement === 'bottom') {
       this.container.classList.add('countdown-bottom');
-    }
-  }
-
-  private createOverlay(): void {
-    if (!this.container || this.config.placement !== 'center') return;
-
-    // Check if already closed in this session
-    if (sessionStorage.getItem('countdown-timer-closed') === 'true') {
-      return;
-    }
-
-    // Create overlay backdrop
-    this.overlay = document.createElement('div');
-    this.overlay.className = 'countdown-overlay';
-    this.overlay.id = 'countdown-overlay';
-    
-    // Close on backdrop click
-    this.overlay.onclick = (e) => {
-      if (e.target === this.overlay) {
-        this.closeOverlay();
-      }
-    };
-
-    // Create wrapper for the timer content
-    const timerWrapper = document.createElement('div');
-    timerWrapper.className = 'countdown-timer-wrapper';
-    
-    // Move container content to wrapper
-    while (this.container.firstChild) {
-      timerWrapper.appendChild(this.container.firstChild);
-    }
-
-    // Add close button
-    const closeButton = document.createElement('button');
-    closeButton.className = 'countdown-close-button';
-    closeButton.innerHTML = '×';
-    closeButton.setAttribute('aria-label', 'Close countdown timer');
-    closeButton.onclick = (e) => {
-      e.stopPropagation();
-      this.closeOverlay();
-    };
-
-    // Add close button and wrapper to container
-    this.container.appendChild(closeButton);
-    this.container.appendChild(timerWrapper);
-
-    // Insert overlay into body
-    document.body.appendChild(this.overlay);
-    this.overlay.appendChild(this.container);
-  }
-
-  private closeOverlay(): void {
-    if (this.overlay) {
-      this.isClosed = true;
-      this.overlay.style.display = 'none';
-      // Store in sessionStorage to remember closed state
-      sessionStorage.setItem('countdown-timer-closed', 'true');
     }
   }
 
@@ -138,125 +78,94 @@ class CountdownTimer {
     return `countdown-size-${this.config.size}`;
   }
 
-  private render(): void {
-    if (!this.container) return;
+  // private render(): void {
+  //   if (!this.container) return;
 
-    // Check if overlay was closed
-    if (this.config.placement === 'center' && sessionStorage.getItem('countdown-timer-closed') === 'true') {
-      if (this.overlay) {
-        this.overlay.style.display = 'none';
-      }
-      return;
-    }
+  //   const timeRemaining = this.calculateTimeRemaining();
 
-    // Find the timer wrapper if it exists (for overlay mode)
-    const timerWrapper = this.container.querySelector('.countdown-timer-wrapper');
-    const renderTarget = timerWrapper || this.container;
+  //   if (!timeRemaining) {
+  //     const expiredHTML = `
+  //       <div class="countdown-timer expired">
+  //         <h3 class="countdown-title">${this.config.title || 'Countdown Timer'}</h3>
+  //         <div class="countdown-expired">Countdown Expired!</div>
+  //       </div>
+  //     `;
+  //     this.container.innerHTML = expiredHTML;
+  //     return;
+  //   }
 
-    const timeRemaining = this.calculateTimeRemaining();
+  //   let timerHTML = `
+  //     <div class="countdown-timer ${this.getSizeClass()}">
+  //       ${this.config.title ? `<h3 class="countdown-title">${this.config.title}</h3>` : ''}
+  //       ${this.config.message ? `<p class="countdown-message">${this.config.message}</p>` : ''}
+  //       <div class="countdown-display countdown-${this.config.format}">
+  //   `;
 
-    if (!timeRemaining) {
-      const expiredHTML = `
-        <div class="countdown-timer expired">
-          <h3 class="countdown-title">${this.config.title || 'Countdown Timer'}</h3>
-          <div class="countdown-expired">Countdown Expired!</div>
-        </div>
-      `;
-      
-      if (timerWrapper) {
-        timerWrapper.innerHTML = expiredHTML;
-      } else {
-        // Remove close button if exists before setting innerHTML
-        const closeBtn = this.container.querySelector('.countdown-close-button');
-        this.container.innerHTML = expiredHTML;
-        if (closeBtn && this.config.placement === 'center') {
-          this.container.appendChild(closeBtn);
-        }
-      }
-      return;
-    }
+  //   if (this.config.format === 'minimal') {
+  //     timerHTML += `
+  //       <div class="countdown-minimal">
+  //         ${timeRemaining.days}d ${timeRemaining.hours}h ${timeRemaining.minutes}m ${timeRemaining.seconds}s
+  //       </div>
+  //     `;
+  //   } else if (this.config.format === 'compact') {
+  //     timerHTML += `
+  //       <div class="countdown-compact">
+  //         <div class="countdown-unit">
+  //           <span class="countdown-number">${this.formatNumber(timeRemaining.days)}</span>
+  //           ${this.config.showLabels ? '<span class="countdown-label">Days</span>' : ''}
+  //         </div>
+  //         <span class="countdown-separator">:</span>
+  //         <div class="countdown-unit">
+  //           <span class="countdown-number">${this.formatNumber(timeRemaining.hours)}</span>
+  //           ${this.config.showLabels ? '<span class="countdown-label">Hours</span>' : ''}
+  //         </div>
+  //         <span class="countdown-separator">:</span>
+  //         <div class="countdown-unit">
+  //           <span class="countdown-number">${this.formatNumber(timeRemaining.minutes)}</span>
+  //           ${this.config.showLabels ? '<span class="countdown-label">Minutes</span>' : ''}
+  //         </div>
+  //         <span class="countdown-separator">:</span>
+  //         <div class="countdown-unit">
+  //           <span class="countdown-number">${this.formatNumber(timeRemaining.seconds)}</span>
+  //           ${this.config.showLabels ? '<span class="countdown-label">Seconds</span>' : ''}
+  //         </div>
+  //       </div>
+  //     `;
+  //   } else {
+  //     // Full format
+  //     timerHTML += `
+  //       <div class="countdown-full">
+  //         <div class="countdown-box">
+  //           <span class="countdown-number">${this.formatNumber(timeRemaining.days)}</span>
+  //           ${this.config.showLabels ? '<span class="countdown-label">Days</span>' : ''}
+  //         </div>
+  //         <div class="countdown-box">
+  //           <span class="countdown-number">${this.formatNumber(timeRemaining.hours)}</span>
+  //           ${this.config.showLabels ? '<span class="countdown-label">Hours</span>' : ''}
+  //         </div>
+  //         <div class="countdown-box">
+  //           <span class="countdown-number">${this.formatNumber(timeRemaining.minutes)}</span>
+  //           ${this.config.showLabels ? '<span class="countdown-label">Minutes</span>' : ''}
+  //         </div>
+  //         <div class="countdown-box">
+  //           <span class="countdown-number">${this.formatNumber(timeRemaining.seconds)}</span>
+  //           ${this.config.showLabels ? '<span class="countdown-label">Seconds</span>' : ''}
+  //         </div>
+  //       </div>
+  //     `;
+  //   }
 
-    let timerHTML = `
-      <div class="countdown-timer ${this.getSizeClass()}">
-        ${this.config.title ? `<h3 class="countdown-title">${this.config.title}</h3>` : ''}
-        ${this.config.message ? `<p class="countdown-message">${this.config.message}</p>` : ''}
-        <div class="countdown-display countdown-${this.config.format}">
-    `;
+  //   timerHTML += `
+  //       </div>
+  //     </div>
+  //   `;
 
-    if (this.config.format === 'minimal') {
-      timerHTML += `
-        <div class="countdown-minimal">
-          ${timeRemaining.days}d ${timeRemaining.hours}h ${timeRemaining.minutes}m ${timeRemaining.seconds}s
-        </div>
-      `;
-    } else if (this.config.format === 'compact') {
-      timerHTML += `
-        <div class="countdown-compact">
-          <div class="countdown-unit">
-            <span class="countdown-number">${this.formatNumber(timeRemaining.days)}</span>
-            ${this.config.showLabels ? '<span class="countdown-label">Days</span>' : ''}
-          </div>
-          <span class="countdown-separator">:</span>
-          <div class="countdown-unit">
-            <span class="countdown-number">${this.formatNumber(timeRemaining.hours)}</span>
-            ${this.config.showLabels ? '<span class="countdown-label">Hours</span>' : ''}
-          </div>
-          <span class="countdown-separator">:</span>
-          <div class="countdown-unit">
-            <span class="countdown-number">${this.formatNumber(timeRemaining.minutes)}</span>
-            ${this.config.showLabels ? '<span class="countdown-label">Minutes</span>' : ''}
-          </div>
-          <span class="countdown-separator">:</span>
-          <div class="countdown-unit">
-            <span class="countdown-number">${this.formatNumber(timeRemaining.seconds)}</span>
-            ${this.config.showLabels ? '<span class="countdown-label">Seconds</span>' : ''}
-          </div>
-        </div>
-      `;
-    } else {
-      // Full format
-      timerHTML += `
-        <div class="countdown-full">
-          <div class="countdown-box">
-            <span class="countdown-number">${this.formatNumber(timeRemaining.days)}</span>
-            ${this.config.showLabels ? '<span class="countdown-label">Days</span>' : ''}
-          </div>
-          <div class="countdown-box">
-            <span class="countdown-number">${this.formatNumber(timeRemaining.hours)}</span>
-            ${this.config.showLabels ? '<span class="countdown-label">Hours</span>' : ''}
-          </div>
-          <div class="countdown-box">
-            <span class="countdown-number">${this.formatNumber(timeRemaining.minutes)}</span>
-            ${this.config.showLabels ? '<span class="countdown-label">Minutes</span>' : ''}
-          </div>
-          <div class="countdown-box">
-            <span class="countdown-number">${this.formatNumber(timeRemaining.seconds)}</span>
-            ${this.config.showLabels ? '<span class="countdown-label">Seconds</span>' : ''}
-          </div>
-        </div>
-      `;
-    }
-
-    timerHTML += `
-        </div>
-      </div>
-    `;
-
-    if (timerWrapper) {
-      timerWrapper.innerHTML = timerHTML;
-    } else {
-      // Preserve close button if it exists
-      const closeBtn = this.container.querySelector('.countdown-close-button');
-      this.container.innerHTML = timerHTML;
-      if (closeBtn && this.config.placement === 'center') {
-        this.container.appendChild(closeBtn);
-      }
-    }
-  }
+  //   // this.container.innerHTML = timerHTML;
+  // }
 
   private start(): void {
     this.intervalId = window.setInterval(() => {
-      this.render();
+      // this.render();
       const timeRemaining = this.calculateTimeRemaining();
       if (!timeRemaining) {
         this.stop();
@@ -273,12 +182,6 @@ class CountdownTimer {
 
   public destroy(): void {
     this.stop();
-    
-    // Remove overlay if it exists
-    if (this.overlay) {
-      this.overlay.remove();
-      this.overlay = null;
-    }
     
     // Clear container content but preserve the container element itself
     if (this.container) {
@@ -391,21 +294,6 @@ function initCountdownTimer(): void {
     timerInstance = null;
   }
 
-  // Clear any existing overlay
-  const existingOverlay = document.getElementById('countdown-overlay');
-  if (existingOverlay) {
-    existingOverlay.remove();
-  }
-
-  // Reset session storage for overlay if placement changed
-  // (This allows overlay to show again if placement changes back to center)
-  const previousPlacement = container.getAttribute('data-previous-placement');
-  if (previousPlacement !== config.placement) {
-    container.setAttribute('data-previous-placement', config.placement);
-    if (config.placement !== 'center') {
-      sessionStorage.removeItem('countdown-timer-closed');
-    }
-  }
 
   // Create new timer instance
   timerInstance = new CountdownTimer(config);
